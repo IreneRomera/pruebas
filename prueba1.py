@@ -29,7 +29,7 @@ class Paciente:
             self.pesoideal = pesoidealM
             self.pesoajustado = pesoajustadoM
 
-st.title("Calculadora nutricional")
+st.title("Calculadora de soporte nutricional")
 
 st.sidebar.header("Datos del paciente")
 
@@ -50,8 +50,7 @@ if st.sidebar.button("Calcular IMC y pesos"):
     paciente.calcular_imc()
     paciente.calcular_pesos()
 
-    st.subheader("Resultados del paciente")
-    st.write(f"ID: **{paciente.ID}**")
+    st.subheader("Resultados antropométricos del paciente")
     st.write(f"IMC: **{paciente.imc}**")
     st.write(f"Peso ideal: **{paciente.pesoideal} kg**")
     st.write(f"Peso ajustado: **{paciente.pesoajustado} kg**")
