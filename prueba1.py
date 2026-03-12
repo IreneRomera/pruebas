@@ -54,3 +54,4 @@ if st.sidebar.button("Calcular IMC y pesos"):
     st.write(f"IMC: **{paciente.imc}**")
     st.write(f"Peso ideal: **{paciente.pesoideal} kg**")
     st.write(f"Peso ajustado: **{paciente.pesoajustado} kg**")
+    st.write(f"Hola al caris")
