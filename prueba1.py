@@ -30,6 +30,7 @@ class Paciente:
             self.pesoajustado = pesoajustadoM
 
 st.title("Calculadora de soporte nutricional")
+st.subheader("<--Despligue para introducir los datos")
 
 st.sidebar.header("Datos del paciente")
 
