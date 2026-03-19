@@ -101,6 +101,17 @@ genero = genero_opcion[0]
 pesokg = st.sidebar.number_input("Peso (kg)", min_value=0.0, max_value=400.0, step=0.1)
 tallacm = st.sidebar.number_input("Talla (cm)", min_value=0.0, max_value=250.0, step=0.1)
 
+if st.sidebar.button("Calcular IMC y pesos"):
+    ID = f"PAC-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    paciente = Paciente(ID, edad, genero, pesokg, tallacm)
+    paciente.calcular_imc()
+    paciente.calcular_pesos()
+
+    st.subheader("Resultados antropométricos del paciente")
+    st.write(f"IMC: **{paciente.imc}**")
+    st.write(f"Peso ideal: **{paciente.pesoideal} kg**")
+    st.write(f"Peso ajustado: **{paciente.pesoajustado} kg**")
+
 st.sidebar.markdown("---")
 st.sidebar.subheader("Objetivos de nutrición enteral")
 
@@ -131,18 +142,6 @@ prote_100ml = st.sidebar.number_input(
 )
 
 
-
-if st.sidebar.button("Calcular IMC y pesos"):
-    ID = f"PAC-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
-    paciente = Paciente(ID, edad, genero, pesokg, tallacm)
-    paciente.calcular_imc()
-    paciente.calcular_pesos()
-
-    st.subheader("Resultados antropométricos del paciente")
-    st.write(f"IMC: **{paciente.imc}**")
-    st.write(f"Peso ideal: **{paciente.pesoideal} kg**")
-    st.write(f"Peso ajustado: **{paciente.pesoajustado} kg**")
-    
 
 if st.sidebar.button("Calcular dosis de nutrición enteral"):
     # Comprobamos que hay datos razonables
