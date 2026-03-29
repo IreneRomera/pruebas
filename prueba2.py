@@ -331,6 +331,110 @@ if calculo == "Ajuste del aporte de potasio":
             st.markdown("---")
             st.write(f"Requerimiento ajustado de potasio: **{requerimiento_k:.1f} mEq/24h**")
 
+# ------------------------------
+# 5) Reposición de sodio
+# ------------------------------
+if calculo == "Reposición de sodio":
+    st.sidebar.subheader("Reposición de sodio")
+
+    natremia_actual = st.sidebar.number_input(
+        "Natremia actual (mEq/L)",
+        min_value=90.0, max_value=170.0, value=125.0, step=0.5
+    )
+
+    natremia_objetivo = st.sidebar.number_input(
+        "Natremia objetivo (mEq/L)",
+        min_value=90.0, max_value=170.0, value=135.0, step=0.5
+    )
+
+    tiempo_horas = st.sidebar.number_input(
+        "Tiempo deseado para la corrección (horas)",
+        min_value=1.0, max_value=72.0, value=24.0, step=1.0
+    )
+
+    solucion_na = st.sidebar.selectbox(
+        "Solución de Na+ para la reposición",
+        [
+            "NaCl 0.9%",
+            "NaCl 3%",
+            "NaCl 5%",
+            "Ringer lactato"
+        ]
+    )
+
+    boton_hipo = st.sidebar.button("Calcular reposición de sodio")
+
+    if boton_hipo:
+        if pesokg <= 0:
+            st.error("Introduce primero un peso válido.")
+        else:
+            # --- 1. Agua corporal total (ACT) aproximada ---
+            # versiones simplificadas de tus fórmulas:
+            if edad < 16:
+                act = 0.6 * pesokg
+            else:
+                if genero == "H":
+                    # fórmulas tipo Watson: simplificada
+                    act = 0.6 * pesokg
+                else:
+                    act = 0.5 * pesokg
+
+            # --- 2. Déficit de sodio total (mEq) ---
+            delta_na = natremia_objetivo - natremia_actual  # mEq/L
+            deficit_na = act * delta_na                     # mEq totales
+
+            # --- 3. Ritmo de corrección previsto ---
+            ritmo_na_dia = (delta_na / tiempo_horas) * 24.0  # mEq/L/día
+
+            # --- 4. Concentración de Na+ de cada solución (mEq/L) ---
+            if solucion_na == "NaCl 0.9%":
+                conc_na = 154.0
+            elif solucion_na == "NaCl 3%":
+                conc_na = 513.0
+            elif solucion_na == "NaCl 5%":
+                conc_na = 855.0
+            elif solucion_na == "Ringer lactato":
+                conc_na = 130.0
+            else:
+                conc_na = 154.0
+
+            # --- 5. Volumen/velocidad aproximada ---
+            # Déficit a repartir en 'tiempo_horas'
+            # mEq/h que queremos aportar:
+            mEq_por_hora = deficit_na / tiempo_horas
+
+            # Volumen de solución necesario por hora (mL/h):
+            # mEq/h / (mEq/L) = L/h  -> *1000 = mL/h
+            vel_ml_h = (mEq_por_hora / conc_na) * 1000.0
+
+            st.subheader("Reposición de sodio")
+            st.write(f"Peso del paciente: **{pesokg} kg**")
+            st.write(f"ACT estimada: **{act:.1f} L**")
+            st.markdown("---")
+            st.write(f"Natremia actual: **{natremia_actual:.1f} mEq/L**")
+            st.write(f"Natremia objetivo: **{natremia_objetivo:.1f} mEq/L**")
+            st.write(f"Diferencia a corregir: **{delta_na:.1f} mEq/L**")
+            st.markdown("---")
+            st.write(f"Déficit total de sodio estimado: **{deficit_na:.1f} mEq**")
+            st.write(f"Tiempo de corrección: **{tiempo_horas:.0f} h**")
+            st.write(f"Ritmo aproximado de corrección: **{ritmo_na_dia:.1f} mEq/L/día**")
+            if ritmo_na_dia > 12:
+                st.error("Ritmo de corrección > 12 mEq/L/día: MUY elevado, alto riesgo de mielinólisis.")
+            elif ritmo_na_dia > 8:
+                st.warning("Ritmo de corrección 8–12 mEq/L/día: elevado, valora prolongar el tiempo de corrección.")
+            else:
+                st.info("Ritmo de corrección dentro de rangos habitualmente recomendados (< 8 mEq/L/día).")
+
+            st.markdown("---")
+            st.write(f"Solución elegida: **{solucion_na}** (≈{conc_na} mEq/L de Na+)")
+            st.write(f"Velocidad aproximada de reposición: **{vel_ml_h:.1f} mL/h**")
+
+            st.caption(
+                "Nota: cálculo orientativo. Ajustar siempre según natremias seriadas, "
+                "situación clínica y recomendaciones de tu protocolo local."
+            )
+
+
 
 
 
