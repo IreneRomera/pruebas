@@ -152,7 +152,7 @@ if calculo == "Necesidades de glucosa":
 
     aporte_glu_kg = st.sidebar.number_input(
         "Aporte de glucosa deseado (g/kg/día)",
-        min_value=0.0, max_value=15.0, value=3.0, step=0.5,
+        min_value=0.0, max_value=15.0, value=2.0, step=0.5,
         help="Introduce el objetivo de glucosa en gramos por kg de peso y día."
     )
 
