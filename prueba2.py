@@ -595,7 +595,7 @@ if calculo == "Reposición de magnesio":
 
     mg_actual = st.sidebar.number_input(
         "Magnesemia actual (mg/dL)",
-        min_value=0.2, max_value=3.0, value=1.3, step=0.1
+        min_value=0.2, max_value=3.0, value=1.3, step=0.01
     )
 
     boton_mg = st.sidebar.button("Calcular reposición de magnesio")
