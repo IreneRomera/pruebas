@@ -208,6 +208,129 @@ if calculo == "Necesidades de glucosa":
             st.write(f"Velocidad aproximada: **{vel_ml_h:.1f} mL/h**")
 
 
+# ------------------------------
+# 3) Ajuste del aporte de sodio
+# ------------------------------
+if calculo == "Ajuste del aporte de sodio":
+    st.sidebar.subheader("Aporte de sodio en 24 h")
+
+    suero_tipo = st.sidebar.selectbox(
+        "Tipo de suero principal",
+        [
+            "NaCl 0.9%",
+            "Glucosalino 0.33%",
+            "NaCl 0.45%",
+            "Ringer lactato",
+            "Plasmalyte",
+            "No recibe suero"
+        ]
+    )
+
+    suero_vol = st.sidebar.number_input(
+        "Volumen de suero en 24 h (mL)",
+        min_value=0.0, max_value=10000.0, value=0.0, step=50.0
+    )
+
+    nutri_vol = st.sidebar.number_input(
+        "Volumen de nutrición artificial (NE/NPT) en 24 h (mL)",
+        min_value=0.0, max_value=10000.0, value=0.0, step=50.0
+    )
+
+    nutri_tipo = st.sidebar.number_input(
+        "Concentración de sodio de la nutrición (mmol/100 mL)",
+        min_value=0.0, max_value=100.0, value=0.0, step=1.0
+    )
+
+    extra_na = st.sidebar.number_input(
+        "Aporte extra de sodio (mmol/24 h)",
+        min_value=0.0, max_value=1000.0, value=0.0, step=5.0
+    )
+
+    boton_na = st.sidebar.button("Calcular balance de sodio")
+
+    if boton_na:
+        if pesokg <= 0:
+            st.error("Introduce primero un peso válido.")
+        else:
+            # mmol de sodio según tipo de suero (por litro)
+            if suero_tipo == "NaCl 0.9%":
+                na_suero_mmol_l = 154.0
+            elif suero_tipo == "Glucosalino 0.33%":
+                na_suero_mmol_l = 51.0
+            elif suero_tipo == "NaCl 0.45%":
+                na_suero_mmol_l = 77.0
+            elif suero_tipo == "Ringer lactato":
+                na_suero_mmol_l = 130.0
+            elif suero_tipo == "Plasmalyte":
+                na_suero_mmol_l = 140.0
+            else:  # No recibe suero
+                na_suero_mmol_l = 0.0
+
+            aporte_suero = na_suero_mmol_l * (suero_vol / 1000.0)
+            aporte_nutricion = nutri_vol * (nutri_tipo / 100.0)
+            aporte_total = aporte_suero + aporte_nutricion + extra_na
+
+            requerimiento_est = pesokg  # aprox. mmol/24h ~ peso
+
+            st.subheader("Ajuste del aporte de sodio")
+            st.write(f"Peso del paciente: **{pesokg} kg**")
+            st.markdown("---")
+            st.write(f"Aporte desde suero: **{aporte_suero:.1f} mmol/24h**")
+            st.write(f"Aporte desde nutrición: **{aporte_nutricion:.1f} mmol/24h**")
+            st.write(f"Aporte extra: **{extra_na:.1f} mmol/24h**")
+            st.markdown("---")
+            st.write(f"Aporte total estimado: **{aporte_total:.1f} mmol/24h**")
+            st.write(f"Requerimiento estimado (≈peso): **{requerimiento_est:.1f} mmol/24h**")
+            st.markdown("---")
+
+            balance = aporte_total - requerimiento_est
+            if balance > 0:
+                st.warning(f"Balance positivo de sodio: **+{balance:.1f} mmol/24h** (posible exceso).")
+            elif balance < 0:
+                st.info(f"Balance negativo de sodio: **{balance:.1f} mmol/24h** (posible déficit).")
+            else:
+                st.success("El aporte de sodio está muy próximo al requerimiento estimado.")
+                
+                
+# ------------------------------
+# 4) Ajuste del aporte de potasio
+# ------------------------------
+if calculo == "Ajuste del aporte de potasio":
+    st.sidebar.subheader("Requerimiento ajustado de potasio")
+
+    diuresis_ml = st.sidebar.number_input(
+        "Diuresis en 24 h (mL)",
+        min_value=0.0, max_value=10000.0, value=0.0, step=50.0
+    )
+
+    kcal_dia = st.sidebar.number_input(
+        "Aporte calórico actual (kcal/día)",
+        min_value=0.0, max_value=6000.0, value=0.0, step=50.0
+    )
+
+    boton_k = st.sidebar.button("Calcular requerimiento de potasio")
+
+    if boton_k:
+        if pesokg <= 0:
+            st.error("Introduce primero un peso válido.")
+        else:
+            # Tu fórmula original:
+            # diu = 30*(g/1000)
+            # potasi = diu + (kcd/100)
+            perdidas_urinarias = 30 * (diuresis_ml / 1000.0)    # mmol por diuresis
+            aporte_por_kcal = kcal_dia / 100.0                  # mmol por aporte calórico
+
+            requerimiento_k = perdidas_urinarias + aporte_por_kcal
+
+            st.subheader("Ajuste del aporte de potasio")
+            st.write(f"Diuresis: **{diuresis_ml:.0f} mL/24h**")
+            st.write(f"Aporte calórico: **{kcal_dia:.0f} kcal/día**")
+            st.markdown("---")
+            st.write(f"Pérdidas urinarias estimadas: **{perdidas_urinarias:.1f} mEq/24h**")
+            st.write(f"Requerimiento por aporte calórico: **{aporte_por_kcal:.1f} mEq/24h**")
+            st.markdown("---")
+            st.write(f"Requerimiento ajustado de potasio: **{requerimiento_k:.1f} mEq/24h**")
+
 
 
 
