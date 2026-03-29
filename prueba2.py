@@ -113,12 +113,8 @@ if calculo == "Necesidades de sueroterapia":
             st.error("Introduce primero un peso válido.")
         else:
             # Intervalo de volumen horario (mL/día)
-            vol_hora_min = 25 * pesokg
-            vol_hora_max = 30 * pesokg
-
-            # Volumen total (mL/h) sin factores de estrés
-            vol_total_min = vol_hora_min / 24
-            vol_total_max = vol_hora_max / 24
+            vol_dia_min = 25 * pesokg
+            vol_dia_max = 30 * pesokg
 
             # Ajuste por situación clínica
             if situacion == "Con fiebre":
@@ -128,11 +124,13 @@ if calculo == "Necesidades de sueroterapia":
             else:
                 factor = 1.0
 
-            vol_total_min_aj = vol_total_min * factor
-            vol_total_max_aj = vol_total_max * factor
+            vol_total_min_aj = vol_dia_min * factor
+            vol_total_max_aj = vol_dia_max * factor
+            
+            # velocidad hora (mL/h) 
+            vel_hora_min = vol_dia_min / 24
+            vel_hora_max = vol_dia_max / 24
 
-            vel_hora_min_aj = vol_total_min_aj / 24
-            vel_hora_max_aj = vol_total_max_aj / 24
 
             st.subheader("Necesidades de sueroterapia")
             st.write(f"Peso del paciente: **{pesokg} kg**")
@@ -143,8 +141,9 @@ if calculo == "Necesidades de sueroterapia":
                 f"Volumen recomendado: **{int(vol_total_min_aj)}–{int(vol_total_max_aj)} mL/día**"
             )
             st.write(
-                f"Velocidad de perfusión: **{vel_hora_min_aj:.1f}–{vel_hora_max_aj:.1f} mL/h**"
+                f"Velocidad de perfusión: **{vel_hora_min:.1f}–{vel_hora_max:.1f} mL/h**"
             )
+            
 
 
 
