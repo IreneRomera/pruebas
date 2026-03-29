@@ -349,7 +349,7 @@ if calculo == "Reposición de sodio":
 
     tiempo_horas = st.sidebar.number_input(
         "Tiempo deseado para la corrección (horas)",
-        min_value=1.0, max_value=72.0, value=24.0, step=1.0
+        min_value=1.0, max_value=96.0, value=36.0, step=1.0
     )
 
     solucion_na = st.sidebar.selectbox(
@@ -368,17 +368,16 @@ if calculo == "Reposición de sodio":
         if pesokg <= 0:
             st.error("Introduce primero un peso válido.")
         else:
-            # --- 1. Agua corporal total (ACT) aproximada ---
-            # versiones simplificadas de tus fórmulas:
+            # --- 1. Agua corporal total (ACT) según TUS FÓRMULAS ---
             if edad < 16:
                 act = 0.6 * pesokg
             else:
                 if genero == "H":
-                    # fórmulas tipo Watson: simplificada
-                    act = 0.6 * pesokg
-                else:
-                    act = 0.5 * pesokg
-
+                    act = 2.447 - (0.09516 * edad) + (0.1074 * tallacm) + (0.3362 * pesokg)
+                else:  # genero == "M"
+                    act = -2.097 + (0.1069 * tallacm) + (0.2466 * pesokg)
+                    
+                    
             # --- 2. Déficit de sodio total (mEq) ---
             delta_na = natremia_objetivo - natremia_actual  # mEq/L
             deficit_na = act * delta_na                     # mEq totales
