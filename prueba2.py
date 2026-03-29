@@ -497,7 +497,94 @@ if calculo == "Reposición de potasio":
                 )
 
 
+# ------------------------------
+# 7) Reposición de calcio (hipocalcemia)
+# ------------------------------
+if calculo == "Reposición de calcio":
+    st.sidebar.subheader("Reposición de calcio")
 
+    modo_calcio = st.sidebar.radio(
+        "¿Cómo quieres valorar la hipocalcemia?",
+        options=[
+            "Según calcio iónico",
+            "Según calcio corregido por albúmina"
+        ]
+    )
+
+    if modo_calcio == "Según calcio iónico":
+        cal_ionico = st.sidebar.number_input(
+            "Calcio iónico (mmol/L)",
+            min_value=0.5, max_value=1.6, value=1.05, step=0.01
+        )
+
+        boton_calcio = st.sidebar.button("Calcular reposición según calcio iónico")
+
+        if boton_calcio:
+            st.subheader("Reposición de calcio según calcio iónico")
+
+            st.write(f"Calcio iónico: **{cal_ionico:.2f} mmol/L**")
+
+            if 1.00 <= cal_ionico <= 1.12:
+                st.warning(
+                    "Hipocalcemia leve/moderada.\n\n"
+                    "Se recomienda reposición con **2 g de gluconato cálcico 10% (bolo IV)** "
+                    "a administrar en aproximadamente **2 horas**."
+                )
+            elif cal_ionico < 1.00:
+                st.error(
+                    "Hipocalcemia más marcada.\n\n"
+                    "Se recomienda reposición con **4 g de gluconato cálcico 10% (bolo IV)** "
+                    "a administrar en aproximadamente **4 horas**."
+                )
+            else:
+                st.info("El calcio iónico no está bajo según los rangos indicados.")
+
+            st.caption(
+                "Esquema basado en tu protocolo: ajustar siempre a la situación clínica, "
+                "ECG y función renal, siguiendo las guías locales."
+            )
+
+    else:  # Según calcio corregido por albúmina
+        cal_corregido = st.sidebar.number_input(
+            "Calcio corregido por albúmina (mmol/L)",
+            min_value=1.0, max_value=3.0, value=2.0, step=0.01
+        )
+
+        sintomas = st.sidebar.radio(
+            "¿Tiene síntomas de hipocalcemia?",
+            options=["No", "Sí"]
+        )
+
+        boton_calcio2 = st.sidebar.button("Calcular reposición según calcio corregido")
+
+        if boton_calcio2:
+            st.subheader("Reposición de calcio según calcio corregido")
+
+            st.write(f"Calcio corregido: **{cal_corregido:.2f} mmol/L**")
+            st.write(f"Síntomas de hipocalcemia: **{sintomas}**")
+            st.markdown("---")
+
+            if cal_corregido <= 2.2 and cal_corregido >= 1.9 and sintomas == "No":
+                st.info(
+                    "Hipocalcemia leve, paciente asintomático.\n\n"
+                    "Se recomienda tratamiento con **carbonato cálcico oral +/- vitamina D** "
+                    "según tolerancia y protocolo local."
+                )
+            elif cal_corregido < 1.9 or sintomas == "Sí":
+                st.error(
+                    "Hipocalcemia significativa o paciente sintomático.\n\n"
+                    "Se recomienda:\n"
+                    "- **Gluconato cálcico 10% IV** 10–20 mL en 100 mL de SG 5% durante 10 minutos (bolo).\n"
+                    "- seguido de **Gluconato cálcico 10%** (100 mL = 10 ampollas) en 1 L de NaCl 0.9% "
+                    "o SG 5% a **50–100 mL/h**."
+                )
+            else:
+                st.info("El calcio corregido no está bajo según los rangos indicados.")
+
+            st.caption(
+                "Esquema basado en tu algoritmo original. Valorar siempre clínica, ECG "
+                "y riesgo de extravasación, y seguir las recomendaciones de tu unidad."
+            )
 
 
 
