@@ -433,6 +433,68 @@ if calculo == "Reposición de sodio":
                 "situación clínica y recomendaciones de tu protocolo local."
             )
 
+# ------------------------------
+# 6) Reposición de potasio
+# ------------------------------
+if calculo == "Reposición de potasio":
+    st.sidebar.subheader("Reposición de potasio")
+
+    k_actual = st.sidebar.number_input(
+        "Potasemia actual (mEq/L)",
+        min_value=1.0, max_value=7.0, value=3.0, step=0.1
+    )
+
+    k_objetivo = st.sidebar.number_input(
+        "Potasemia objetivo (mEq/L)",
+        min_value=1.0, max_value=7.0, value=4.0, step=0.1
+    )
+
+    sintomas_k = st.sidebar.radio(
+        "¿Tiene síntomas de hipopotasemia?",
+        options=["No", "Sí"]
+    )
+
+    boton_k_repo = st.sidebar.button("Calcular reposición de potasio")
+
+    if boton_k_repo:
+        if pesokg <= 0 or tallacm <= 0:
+            st.error("Introduce primero un peso y una talla válidos.")
+        else:
+            # Aseguramos que tenemos peso ideal calculado
+            paciente.calcular_pesos()
+            if paciente.pesoideal is None:
+                st.error("No se pudo calcular el peso ideal; revisa los datos de talla y género.")
+            else:
+                dif_k = k_objetivo - k_actual          # mEq/L
+                deficit_k = dif_k * paciente.pesoideal # mEq totales aproximados
+
+                st.subheader("Reposición de potasio")
+                st.write(f"Potasemia actual: **{k_actual:.1f} mEq/L**")
+                st.write(f"Potasemia objetivo: **{k_objetivo:.1f} mEq/L**")
+                st.write(f"Diferencia a corregir: **{dif_k:.1f} mEq/L**")
+                st.markdown("---")
+                st.write(f"Peso ideal estimado: **{paciente.pesoideal:.1f} kg**")
+                st.write(f"Déficit estimado de potasio: **{deficit_k:.1f} mEq**")
+
+                st.markdown("---")
+                if deficit_k <= 0:
+                    st.info("No se estima déficit positivo de potasio con estos valores.")
+                else:
+                    if sintomas_k == "Sí":
+                        st.warning(
+                            "Paciente sintomático: considerar reposición IV más rápida "
+                            "según protocolo local."
+                        )
+                    else:
+                        st.info(
+                            "Paciente asintomático: considerar reposición fraccionada "
+                            "en varias dosis según protocolo local."
+                        )
+
+                st.caption(
+                    "Cálculo orientativo usando déficit = (K objetivo − K actual) × peso ideal. "
+                    "Ajustar siempre según EKG, función renal y guías locales."
+                )
 
 
 
