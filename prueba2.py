@@ -514,7 +514,7 @@ if calculo == "Reposición de calcio":
     if modo_calcio == "Según calcio iónico":
         cal_ionico = st.sidebar.number_input(
             "Calcio iónico (mmol/L)",
-            min_value=0.5, max_value=1.6, value=1.05, step=0.01
+            min_value=0.2, max_value=1.6, value=1.05, step=0.01
         )
 
         boton_calcio = st.sidebar.button("Calcular reposición según calcio iónico")
@@ -532,7 +532,7 @@ if calculo == "Reposición de calcio":
                 )
             elif cal_ionico < 1.00:
                 st.error(
-                    "Hipocalcemia más marcada.\n\n"
+                    "Hipocalcemia moderada-severa.\n\n"
                     "Se recomienda reposición con **4 g de gluconato cálcico 10% (bolo IV)** "
                     "a administrar en aproximadamente **4 horas**."
                 )
@@ -547,7 +547,7 @@ if calculo == "Reposición de calcio":
     else:  # Según calcio corregido por albúmina
         cal_corregido = st.sidebar.number_input(
             "Calcio corregido por albúmina (mmol/L)",
-            min_value=1.0, max_value=3.0, value=2.0, step=0.01
+            min_value=0.5, max_value=3.0, value=2.2, step=0.1
         )
 
         sintomas = st.sidebar.radio(
@@ -584,6 +584,78 @@ if calculo == "Reposición de calcio":
             st.caption(
                 "Esquema basado en tu algoritmo original. Valorar siempre clínica, ECG "
                 "y riesgo de extravasación, y seguir las recomendaciones de tu unidad."
+            )
+            
+            
+# ------------------------------
+# 8) Reposición de magnesio (hipomagnesemia)
+# ------------------------------
+if calculo == "Reposición de magnesio":
+    st.sidebar.subheader("Reposición de magnesio")
+
+    mg_actual = st.sidebar.number_input(
+        "Magnesemia actual (mg/dL)",
+        min_value=0.2, max_value=3.0, value=1.3, step=0.1
+    )
+
+    boton_mg = st.sidebar.button("Calcular reposición de magnesio")
+
+    if boton_mg:
+        if pesokg <= 0:
+            st.error("Introduce primero un peso válido.")
+        else:
+            # Parámetros de tu algoritmo original
+            necemag1 = pesokg          # mmol (aprox) para día 1
+            necemag2 = 0.5 * pesokg    # mmol (aprox) para día 2
+
+            gmagdia1 = necemag1 / 8    # g de MgSO4 (1 g = 8 mEq)
+            gmagdia2 = necemag2 / 8
+
+            l = necemag1 / 4           # mEq cada 6h día 1
+            m = necemag2 / 4           # mEq cada 6h día 2
+            n = gmagdia1 / 4           # g cada 6h día 1
+            o = gmagdia2 / 4           # g cada 6h día 2
+
+            st.subheader("Reposición de magnesio (hipomagnesemia)")
+            st.write(f"Magnesemia actual: **{mg_actual:.2f} mg/dL**")
+            st.write(f"Peso del paciente: **{pesokg:.1f} kg**")
+            st.markdown("---")
+
+            if 1.4 <= mg_actual <= 1.7:
+                # Hipomagnesemia leve
+                st.info(
+                    "Hipomagnesemia leve.\n\n"
+                    "Se recomienda reposición con **1–2 dosis IV de 1–2 g** "
+                    "de sulfato de magnesio (8–16 mEq) o, si es posible, "
+                    "reposiciones orales (por ejemplo, óxido de magnesio 400 mg 1–2 comp/día)."
+                )
+
+            elif 1.2 <= mg_actual < 1.4:
+                # Moderada
+                st.warning(
+                    "Hipomagnesemia moderada.\n\n"
+                    "Se recomienda reposición **vía endovenosa de 1–2 g (8–16 mEq)** "
+                    "de sulfato de magnesio **cada 4 horas**, evitando la vía oral."
+                )
+
+            elif mg_actual < 1.2:
+                # Severa: usamos tus fórmulas peso‑dependientes
+                st.error(
+                    "Hipomagnesemia severa.\n\n"
+                    f"**Día 1:**\n"
+                    f"- Reposición IV con aproximadamente **{n:.1f} g** de sulfato de magnesio "
+                    f"cada 6 h (≈ **{l:.1f} mEq** cada 6 h).\n\n"
+                    f"**Día 2:**\n"
+                    f"- Reposición IV con aproximadamente **{o:.1f} g** de sulfato de magnesio "
+                    f"cada 6 h (≈ **{m:.1f} mEq** cada 6 h).\n\n"
+                    "No se recomienda reposición oral en este contexto."
+                )
+            else:
+                st.success("La magnesemia no se encuentra en rango de hipomagnesemia con este umbral.")
+
+            st.caption(
+                "Esquema basado en tu algoritmo original (1 g MgSO₄ ≈ 8 mEq). "
+                "Ajustar siempre a función renal, diuresis y protocolos locales."
             )
 
 
