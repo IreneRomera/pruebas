@@ -746,6 +746,76 @@ if calculo == "Reposición de fosfato":
                 )
 
 
+# ------------------------------
+# 10) Reposición de bicarbonato (acidosis metabólica)
+# ------------------------------
+if calculo == "Reposición de bicarbonato (acidosis metabólica)":
+    st.sidebar.subheader("Reposición de bicarbonato")
+
+    bic_actual = st.sidebar.number_input(
+        "Bicarbonato sérico actual (mmol/L)",
+        min_value=0.0, max_value=40.0, value=16.0, step=0.5
+    )
+
+    sodio_serico = st.sidebar.number_input(
+        "Sodio sérico (mmol/L o mEq/L)",
+        min_value=100.0, max_value=180.0, value=140.0, step=1.0
+    )
+
+    cloro_serico = st.sidebar.number_input(
+        "Cloro sérico (mmol/L o mEq/L)",
+        min_value=70.0, max_value=140.0, value=100.0, step=1.0
+    )
+
+    boton_bic = st.sidebar.button("Calcular reposición de bicarbonato")
+
+    if boton_bic:
+        if pesokg <= 0:
+            st.error("Introduce primero un peso válido.")
+        else:
+            st.subheader("Reposición de bicarbonato (acidosis metabólica)")
+            st.write(f"Peso del paciente: **{pesokg:.1f} kg**")
+            st.write(f"Bicarbonato actual: **{bic_actual:.1f} mmol/L**")
+            st.markdown("---")
+
+            # 1) Déficit de bicarbonato
+            # Tu fórmula: deficitbic = 0.4 * peso * (24 - HCO3)
+            deficit_bic = 0.4 * pesokg * (24.0 - bic_actual)
+
+            if deficit_bic <= 0:
+                st.success("No se estima déficit de bicarbonato con estos valores (HCO₃⁻ ≥ 24).")
+            else:
+                st.write(f"Déficit estimado de bicarbonato: **{deficit_bic:.1f} mmol**")
+                dosis_1h = deficit_bic / 2.0
+                dosis_restante = deficit_bic - dosis_1h
+
+                st.markdown("---")
+                st.info(
+                    f"Recomendación (según tu esquema):\n\n"
+                    f"- Reponer aproximadamente **{dosis_1h:.1f} mmol** en **1 hora**.\n"
+                    f"- Reponer los **{dosis_restante:.1f} mmol** restantes en las siguientes **4–6 horas**.\n"
+                )
+
+            # 2) Anión gap y delta gap
+            anion_gap = sodio_serico - (cloro_serico + bic_actual)
+            delta_gap = (anion_gap - 12.0) / (24.0 - bic_actual) if (24.0 - bic_actual) != 0 else None
+
+            st.markdown("---")
+            st.write(f"Anión gap: **{anion_gap:.1f} mEq/L**")
+
+            if delta_gap is not None:
+                st.write(f"Delta gap: **{delta_gap:.2f}**")
+            else:
+                st.write("Delta gap no calculable (24 − HCO₃⁻ = 0).")
+
+            st.caption(
+                "Déficit de bicarbonato calculado como 0.4 × peso × (24 − HCO₃⁻), siguiendo tu algoritmo. "
+                "Interpretar anión gap y delta gap junto con la clínica y gases arteriales."
+            )
+
+
+
+
 
 
 
