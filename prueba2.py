@@ -658,5 +658,97 @@ if calculo == "Reposición de magnesio":
                 "Ajustar siempre a función renal, diuresis y protocolos locales."
             )
 
+# ------------------------------
+# 9) Reposición de fosfato (hipofosfatemia)
+# ------------------------------
+if calculo == "Reposición de fosfato":
+    st.sidebar.subheader("Reposición de fosfato")
+
+    sintomas_fosf = st.sidebar.radio(
+        "¿Tiene síntomas de hipofosfatemia?",
+        options=["No", "Sí"]
+    )
+
+    fosfato_serico = st.sidebar.number_input(
+        "Fosfato sérico (mg/dL)",
+        min_value=0.1, max_value=10.0, value=2.0, step=0.1
+    )
+
+    boton_fosf = st.sidebar.button("Calcular reposición de fosfato")
+
+    if boton_fosf:
+        if pesokg <= 0:
+            st.error("Introduce primero un peso válido.")
+        else:
+            # Aseguramos IMC y pesos
+            paciente.calcular_imc()
+            paciente.calcular_pesos()
+
+            if paciente.imc is None:
+                st.error("No se pudo calcular el IMC; revisa talla/peso.")
+            else:
+                st.subheader("Reposición de fosfato (hipofosfatemia)")
+                st.write(f"IMC: **{paciente.imc:.1f} kg/m²**")
+                st.write(f"Fosfato sérico: **{fosfato_serico:.2f} mg/dL**")
+                st.write(f"Síntomas: **{sintomas_fosf}**")
+                st.markdown("---")
+
+                # Cálculos según tu algoritmo
+                if paciente.imc < 30:
+                    # Peso normal: usamos peso real
+                    base = pesokg
+                else:
+                    # Obeso: usamos peso ajustado
+                    if paciente.pesoajustado is None:
+                        st.error("No se pudo calcular el peso ajustado.")
+                        base = pesokg
+                    else:
+                        base = paciente.pesoajustado
+
+                # Rangos de reposición basados en tu código:
+                # i1=0.08*b; i2=0.16*b; i3=0.32*b; s3=0.64*b
+                r1_min = 0.08 * base
+                r1_max = 0.16 * base
+                r2_min = 0.16 * base
+                r2_max = 0.32 * base
+                r3_min = 0.32 * base
+                r3_max = 0.64 * base
+
+                mensaje = ""
+
+                if sintomas_fosf == "Sí":
+                    # Sintomático: ir directamente a rango más alto
+                    mensaje = f"Se recomienda reposición con **{r3_min:.1f}–{r3_max:.1f} mmol** de fosfato."
+                else:
+                    # Asintomático: según fosfato sérico
+                    if fosfato_serico <= 2.7 and fosfato_serico >= 2.3:
+                        mensaje = f"Se recomienda reposición con **{r1_min:.1f}–{r1_max:.1f} mmol** de fosfato."
+                    elif 1.5 <= fosfato_serico < 2.3:
+                        mensaje = f"Se recomienda reposición con **{r2_min:.1f}–{r2_max:.1f} mmol** de fosfato."
+                    elif fosfato_serico < 1.5:
+                        mensaje = f"Se recomienda reposición con **{r3_min:.1f}–{r3_max:.1f} mmol** de fosfato."
+                    else:
+                        mensaje = "El fosfato sérico no está en rango de hipofosfatemia según este esquema."
+
+                if "mmol" in mensaje:
+                    if paciente.imc < 30:
+                        st.info("Paciente con IMC < 30: se usa el peso real para el cálculo.")
+                    else:
+                        st.info("Paciente con IMC ≥ 30: se usa el peso ajustado para el cálculo.")
+
+                    st.warning(mensaje)
+                else:
+                    st.success(mensaje)
+
+                st.caption(
+                    "Esquema basado en tu algoritmo original. Ajustar siempre según función renal, "
+                    "riesgo de precipitación de sales de calcio y protocolo local."
+                )
+
+
+
+
+
+
 
 
