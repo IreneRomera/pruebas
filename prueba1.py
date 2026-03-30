@@ -179,7 +179,7 @@ st.caption("App desarrollada por Irene Romera / irene.r.s@outlook.com 😊")
 st.write("Si esta calculadora te resulta útil …")
 
 button(
-    username="buymeacoffee.com/ireneromera",      # tu usuario de buymeacoffee.com
+    username="ireneromera",      # tu usuario de buymeacoffee.com
     floating=False,                  # que no flote, aparece en el flujo normal
     text="Invítame a un café",
     emoji="☕",
