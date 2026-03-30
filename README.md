@@ -1,2 +1,2 @@
 # pruebas
-Pruebas varias de código python
+Contengo el código python de calculadoras publicadas en Streamlit
