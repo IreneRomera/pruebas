@@ -8,6 +8,7 @@ Created on Thu Mar 19 19:23:59 2026
 
 import streamlit as st
 from datetime import datetime
+from streamlit_extras.buy_me_a_coffee import button
 
 class Paciente:
     def __init__(self, ID, edad, genero, pesokg, tallacm):
@@ -171,3 +172,17 @@ if st.sidebar.button("Calcular dosis de nutrición enteral"):
         st.write(f"Velocidad de perfusión: **{paciente.vol_ne_ml_h} mL/h**")
         st.write(f"Proteínas aportadas por la NE: **{paciente.prote_ne} g/día**")
         st.write(f"Proteínas extra necesarias: **{paciente.prote_extra} g/día**")
+
+
+st.markdown("---")
+st.caption("App desarrollada por Irene Romera / irene.r.s@outlook.com 😊")
+st.write("Si esta calculadora te resulta útil …")
+
+button(
+    username="buymeacoffee.com/ireneromera",      # tu usuario de buymeacoffee.com
+    floating=False,                  # que no flote, aparece en el flujo normal
+    text="Invítame a un café",
+    emoji="☕",
+    bg_color="#FFDD00",
+    font_color="#000000"
+)
