@@ -181,7 +181,7 @@ st.write("Si esta calculadora te resulta útil …")
 button(
     username="ireneromera",      # tu usuario de buymeacoffee.com
     floating=False,                  # que no flote, aparece en el flujo normal
-    text="Invítame a un café",
+    text="Invítame a un té",
     emoji="☕",
     bg_color="#FFDD00",
     font_color="#000000"
