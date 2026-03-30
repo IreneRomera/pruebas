@@ -8,6 +8,7 @@ Created on Sun Mar 29 17:57:35 2026
 
 import streamlit as st
 from datetime import datetime
+from streamlit_extras.buy_me_a_coffee import button
 
 st.set_page_config(page_title="Calculadora de sueroterapia y electrolitos")
 
@@ -813,7 +814,18 @@ if calculo == "Reposición de bicarbonato (acidosis metabólica)":
                 "Interpretar anión gap y delta gap junto con la clínica y gases arteriales."
             )
 
+st.markdown("---")
+st.caption("App desarrollada por Irene Romera / irene.r.s@outlook.com 😊")
+st.write("Si esta calculadora te resulta útil …")
 
+button(
+    username="ireneromera",      # tu usuario de buymeacoffee.com
+    floating=False,                  # que no flote, aparece en el flujo normal
+    text="Invítame a un café",
+    emoji="🫖",
+    bg_color="#C084FC",
+    font_color="#FFFFFF"
+)
 
 
 
