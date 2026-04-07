@@ -474,7 +474,6 @@ if calculo == "Reposición de potasio":
                 st.write(f"Potasemia objetivo: **{k_objetivo:.1f} mEq/L**")
                 st.write(f"Diferencia a corregir: **{dif_k:.1f} mEq/L**")
                 st.markdown("---")
-                st.write(f"Peso ideal estimado: **{paciente.pesoideal:.1f} kg**")
                 st.write(f"Déficit estimado de potasio: **{deficit_k:.1f} mEq**")
 
                 st.markdown("---")
