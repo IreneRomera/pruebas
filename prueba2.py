@@ -810,7 +810,7 @@ if calculo == "Reposición de bicarbonato (acidosis metabólica)":
 
             st.caption(
                 "Déficit de bicarbonato calculado como 0.4 × peso × (24 − HCO₃⁻), siguiendo tu algoritmo. "
-                "Interpretar anión gap y delta gap junto con la clínica y gases arteriales. Un delta gap alto sugiere alcalosis metabólica concomitante o acidosis respiratoria crónica, y un delta gap bajo sugiere además una acidosis metabólica hiperclorémica."
+                "Interpretar anión gap y delta gap junto con la clínica y gases arteriales. Un delta gap alto (>2) sugiere alcalosis metabólica concomitante o acidosis respiratoria crónica, y un delta gap bajo (<1) sugiere además una acidosis metabólica hiperclorémica."
             )
 
 st.markdown("---")
