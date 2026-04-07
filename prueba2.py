@@ -467,7 +467,7 @@ if calculo == "Reposición de potasio":
                 st.error("No se pudo calcular el peso ideal; revisa los datos de talla y género.")
             else:
                 dif_k = k_objetivo - k_actual          # mEq/L
-                deficit_k = dif_k * paciente.pesoideal # mEq totales aproximados
+                deficit_k = dif_k * paciente.pesoideal * 0.5 # mEq totales aproximados con factor corrección
 
                 st.subheader("Reposición de potasio")
                 st.write(f"Potasemia actual: **{k_actual:.1f} mEq/L**")
@@ -811,7 +811,7 @@ if calculo == "Reposición de bicarbonato (acidosis metabólica)":
 
             st.caption(
                 "Déficit de bicarbonato calculado como 0.4 × peso × (24 − HCO₃⁻), siguiendo tu algoritmo. "
-                "Interpretar anión gap y delta gap junto con la clínica y gases arteriales."
+                "Interpretar anión gap y delta gap junto con la clínica y gases arteriales. Un delta gap alto sugiere alcalosis metabólica concomitante o acidosis respiratoria crónica, y un delta gap bajo sugiere además una acidosis metabólica hiperclorémica."
             )
 
 st.markdown("---")
