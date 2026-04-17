@@ -238,7 +238,7 @@ st.sidebar.markdown("---")
 # ------------------------------
 st.sidebar.markdown(
     """
-    <h2 style='text-align: center; color: #001F3F;'>
+    <h2 style='text-align: center; color: #003366;'>
         ¿Qué SCORE deseas calcular?
     </h2>
     """,
