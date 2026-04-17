@@ -16,7 +16,6 @@ class Paciente:
         self.ID = ID
         self.edad = edad
         self.genero = genero        # 'H' o 'M'
-        self.pesokg = pesokg
 
 
 # ------------------------------
@@ -257,7 +256,7 @@ score_elegido = st.sidebar.selectbox(
 # Clinical Frailty Scale (CFS)
 # ------------------------------
 if score_elegido == "Clinical Frailty Scale (CFS)":
-    st.sidebar.subheader("Preguntas para CFS (últimas 2 semanas)")
+    st.sidebar.subheader("Preguntas para CFS (respecto a las últimas 2 semanas)")
 
     c1 = st.sidebar.selectbox(
         "Patología de base",
@@ -307,11 +306,8 @@ if score_elegido == "Clinical Frailty Scale (CFS)":
         cfs, descripcion = calcular_cfs_por_preguntas(c1_val, c2_val, c3_val, c4_val)
 
         st.subheader("Clinical Frailty Scale (CFS)")
-        st.write(f"ID: **{paciente.ID}**")
-        st.write(f"Edad: **{edad} años**")
-        st.markdown("---")
         if cfs is not None:
-            st.write(f"Resultado CFS: **{cfs}**")
+            st.write(f"El Clinical Frailty Score es de **{cfs}** puntos")
         st.info(descripcion)
 
 
@@ -391,10 +387,7 @@ if score_elegido == "NEWS-2":
         )
 
         st.subheader("NEWS-2")
-        st.write(f"ID: **{paciente.ID}**")
-        st.write(f"Edad: **{edad} años**")
-        st.markdown("---")
-        st.write(f"NEWS-2 total: **{news2} puntos**")
+        st.write(f"La puntuación NEWS-2 es de  **{news2} puntos**")
         st.info(mensaje)
 
 
