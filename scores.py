@@ -12,7 +12,7 @@ st.subheader("⬅ Usa la barra lateral para introducir datos y elegir el cálcul
 # Clase Paciente (datos básicos)
 # ------------------------------
 class Paciente:
-    def __init__(self, ID, edad, genero, pesokg):
+    def __init__(self, ID, edad, genero):
         self.ID = ID
         self.edad = edad
         self.genero = genero        # 'H' o 'M'
@@ -227,15 +227,9 @@ genero_opcion = st.sidebar.radio(
 )
 genero = genero_opcion[0]  # 'H' o 'M'
 
-pesokg = st.sidebar.number_input(
-    "Peso (kg)",
-    min_value=0.0,
-    max_value=250.0,
-    step=0.1,
-)
 
 ID = f"PAC-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
-paciente = Paciente(ID, edad, genero, pesokg)
+paciente = Paciente(ID, edad, genero)
 
 st.sidebar.markdown("---")
 
