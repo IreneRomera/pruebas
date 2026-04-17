@@ -236,12 +236,21 @@ st.sidebar.markdown("---")
 # ------------------------------
 # Elegir SCORE
 # ------------------------------
+st.sidebar.markdown(
+    """
+    <h2 style='text-align: center; color: #C084FC;'>
+        ¿Qué SCORE deseas calcular?
+    </h2>
+    """,
+    unsafe_allow_html=True,
+)
+
 score_elegido = st.sidebar.selectbox(
-    "¿Qué SCORE deseas calcular?",
+    "",
     [
         "Clinical Frailty Scale (CFS)",
         "NEWS-2",
-        # aquí irás añadiendo más scores en el futuro
+        # futuros scores…
     ],
 )
 
