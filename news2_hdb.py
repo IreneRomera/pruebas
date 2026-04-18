@@ -12,6 +12,8 @@ App Streamlit minimalista
 """
 
 import streamlit as st
+from datetime import datetime
+from streamlit_extras.buy_me_a_coffee import button
 
 # Configuración de página
 st.set_page_config(
@@ -244,3 +246,16 @@ else:
 # Footer
 st.markdown("---")
 st.markdown("*Desarrollado para uso clínico. Validar siempre con criterio médico.*")
+
+st.markdown("---")
+st.caption("App desarrollada por Irene Romera / irene.r.s@outlook.com 😊")
+st.write("Si esta calculadora te resulta útil …")
+
+button(
+    username="ireneromera",      # tu usuario de buymeacoffee.com
+    floating=True,                  # que no flote, aparece en el flujo normal
+    text="Invítame a un té",
+    emoji="🫖",
+    bg_color="#C084FC",
+    font_color="#FFFFFF"
+)
