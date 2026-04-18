@@ -344,7 +344,7 @@ if score_elegido == "Clinical Frailty Scale (CFS)":
 # ------------------------------
 # CFS simplificado (flowchart)
 # ------------------------------
-if score_elegido == "Clinical Frailty Scale (CFS)":
+if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
     st.markdown("---")
     st.subheader("CFS simplificado (flowchart)")
 
