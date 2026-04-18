@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 17 19:10:18 2026
+
+@author: Prunebelly
+"""
 
 import streamlit as st
 from datetime import datetime
@@ -350,30 +357,40 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
 
     st.sidebar.subheader("CFS simplificado (flowchart)")
 
-    opcion_cfs_simpl = st.sidebar.selectbox(
+    # Menú desplegable en la zona central
+    opcion_cfs_simpl = st.selectbox(
         "Selecciona la opción que mejor describa al paciente:",
         options=[
-            "f1 - Enfermedad terminal con expectativa de vida < 6 meses",
-            "f2 - Completamente dependiente y se aproxima al final de su vida",
-            "f3 - Completamente dependiente para el cuidado personal y ABVD",
-            "f4 - Necesita ayuda con todas las actividades fuera de casa, hogar y/o baño",
-            "f5 - Necesita ayuda para AIVD (finanzas, transporte, hogar, comida, medicación)",
-            "f6 - No es dependiente pero los síntomas limitan su vida diaria",
-            "f7 - Problemas de salud bien controlados y ejercicio más allá de caminar",
-            "f8 - Sin síntomas activos y realiza ejercicio ocasional",
-            "f9 - Realiza ejercicio regular y está más ágil/'fit' de lo esperado para su edad",
+            "Enfermedad terminal con expectativa de vida < 6 meses",
+            "Completamente dependiente y se aproxima al final de su vida",
+            "Completamente dependiente para el cuidado personal y ABVD",
+            "Necesita ayuda con todas las actividades fuera de casa, hogar y/o baño",
+            "Necesita ayuda para AIVD (finanzas, transporte, hogar, comida, medicación)",
+            "No es dependiente pero los síntomas limitan su vida diaria",
+            "Problemas de salud bien controlados y ejercicio más allá de caminar",
+            "Sin síntomas activos y realiza ejercicio ocasional",
+            "Realiza ejercicio regular y está más ágil/'fit' de lo esperado para su edad",
         ],
     )
 
-    boton_cfs_simpl = st.sidebar.button("Calcular CFS simplificado")
+    # Mapear texto a código f1..f9
+    mapa_opciones_a_codigo = {
+        "Enfermedad terminal con expectativa de vida < 6 meses": "f1",
+        "Completamente dependiente y se aproxima al final de su vida": "f2",
+        "Completamente dependiente para el cuidado personal y ABVD": "f3",
+        "Necesita ayuda con todas las actividades fuera de casa, hogar y/o baño": "f4",
+        "Necesita ayuda para AIVD (finanzas, transporte, hogar, comida, medicación)": "f5",
+        "No es dependiente pero los síntomas limitan su vida diaria": "f6",
+        "Problemas de salud bien controlados y ejercicio más allá de caminar": "f7",
+        "Sin síntomas activos y realiza ejercicio ocasional": "f8",
+        "Realiza ejercicio regular y está más ágil/'fit' de lo esperado para su edad": "f9",
+    }
 
-    if boton_cfs_simpl:
-        # extraemos el código f1..f9 del inicio del texto
-        codigo = opcion_cfs_simpl.split(" ")[0]   # "f1", "f2", ...
+    codigo = mapa_opciones_a_codigo[opcion_cfs_simpl]
 
-        cfs_simpl, desc_simpl = calcular_cfs_simplificado(codigo)
+    cfs_simpl, desc_simpl = calcular_cfs_simplificado(codigo)
 
-        st.info(desc_simpl)
+    st.info(desc_simpl)
 
 
 # ------------------------------
@@ -470,4 +487,10 @@ button(
 )
 
 
-  
+        
+# generar un botón para calcular "Clinical Frailty Score" --> def CFSquestions(self)
+# generar un botón para calcular "NEWS-2" --> def get_news2(self)
+# generar un botón para calcular "qSOFA" -->
+# generar un botón para calcular "SOFA score" -->
+# generar un botón para calcular "APACHE-II score" -->
+# generar un botón para calcular "TEP: ..........." -->
