@@ -213,12 +213,12 @@ if st.session_state.get("score") is not None:
     st.markdown(f'<div class="main-result">{st.session_state["score"]}</div>', unsafe_allow_html=True)
     st.markdown(f"### {st.session_state['riesgo']}")
 
-    st.subheader("📋 Resumen de parámetros")
-    data = {
-        "Parámetro": ["O₂", "FR (rpm)", "EPOC", "SpO₂ (%)", "PAs", "FC", "Temp (°C)", "Conciencia"],
-        "Valor": [a, b, c, d, e, f, g, h]
-    }
-    st.table(data)
+    #st.subheader("📋 Resumen de parámetros")
+    #data = {
+     #   "Parámetro": ["O₂", "FR (rpm)", "EPOC", "SpO₂ (%)", "PAs", "FC", "Temp (°C)", "Conciencia"],
+     #   "Valor": [a, b, c, d, e, f, g, h]
+    #}
+    #st.table(data)
 else:
     st.info("👆 Introduce los datos en la barra lateral y pulsa CALCULAR.")
 
