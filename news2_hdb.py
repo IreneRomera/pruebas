@@ -145,12 +145,10 @@ def calcular_news2(a, b, c, d, e, f, g, h):
         contador += 3
 
     # Interpretación
-    if contador >= 5:
-        riesgo = "⚠️ Riesgo ALTO - Valoración emergente (<1h). Avisar Medicina Intensiva (6457)"
-    elif contador == 4:
-        riesgo = "⚠️ Riesgo MODERADO - Valoración prioritaria (2h). Avisar médico responsable"
+    if contador >= 4:
+        riesgo = "⚠️ Riesgo MODERADO o ALTO - Se recomienda una valoración emergente del paciente (menos de 1 hora). Avisar al equipo de Medicina Intensiva (6457)"
     elif 1 <= contador <= 3:
-        riesgo = "ℹ️ Riesgo BAJO - Valoración en 6h. Seguimiento"
+        riesgo = "⚠️ Riesgo BAJO - Se recomienda una valoración del paciente prioritaria en las siguientes 2 horas. Avisar a su médico responsable o al médico de guardia de la especialidad correspondiente cuando se trate de jornada de guardia"
     else:
         riesgo = "✅ Sin riesgo - Observación rutinaria"
 
