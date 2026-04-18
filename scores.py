@@ -358,13 +358,17 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
     st.sidebar.subheader("CFS simplificado (flowchart)")
 
     # Menú desplegable en la zona central
+    st.markdown(
+    """
+    <h2 style="color:#003366;">
+        Responda respecto a la situación del paciente en las últimas 2 semanas
+    </h2>
+    """,
+    unsafe_allow_html=True,
+)
+
     opcion_cfs_simpl = st.selectbox(
-        f"""
-        <h2 style="color:#003366;">
-            Responda respecto a la situación del paciente en las últimas 2 semanas)
-        </h2>
-        """,
-        options=[
+    options=[
             "Enfermedad terminal con expectativa de vida < 6 meses",
             "Completamente dependiente y se aproxima al final de su vida",
             "Completamente dependiente para el cuidado personal y ABVD",
@@ -395,7 +399,6 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
     cfs_simpl, desc_simpl = calcular_cfs_simplificado(codigo)
 
     st.info(desc_simpl)
-
 
 # ------------------------------
 # NEWS-2
