@@ -49,48 +49,48 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Título principal
-st.title("🏥 NEWS-2 adaptado al Hospital de Barcelona")
+st.title("🏥 NEWS-2 adaptado al Hospital de Barcelona 🏥")
 
 # Sidebar para inputs
 with st.sidebar:
-    st.markdown("### 📊 Introducir datos del paciente")
+    st.markdown("### 📊 Introducir datos clínicos del paciente")
     
     # Input a: Soporte O2
     a = st.selectbox(
         "¿Precisa soporte con O₂?",
         options=[None, 1, 2],
-        format_func=lambda x: "1.- No" if x == 1 else "2.- Sí" if x == 2 else "Selecciona...",
+        format_func=lambda x: "No" if x == 1 else "Sí" if x == 2 else "Selecciona...",
         index=0
     )
     
     # Input b: Frecuencia respiratoria
-    b = st.number_input("Frecuencia respiratoria (rpm)", min_value=0, max_value=60, value=0, step=1)
+    b = st.number_input("Frecuencia respiratoria (rpm)", min_value=0, max_value=45, value=15, step=1)
     
     # Input c: Tipo de insuficiencia respiratoria
     c = st.selectbox(
-        "¿Paciente con...?",
+        "¿Paciente con enfermedad pulmonar obstructiva crónica (EPOC)?",
         options=[None, 1, 2],
-        format_func=lambda x: "1.- Insuficiencia respiratoria hipoxémica" if x == 1 else "2.- Hipercápnica" if x == 2 else "Selecciona...",
+        format_func=lambda x: "No" if x == 1 else "Sí" if x == 2 else "Selecciona...",
         index=0
     )
     
     # Input d: SpO2
-    d = st.number_input("SpO₂ (%)", min_value=0, max_value=100, value=0, step=1)
+    d = st.number_input("SpO₂ (%)", min_value=0, max_value=100, value=95, step=1)
     
     # Input e: PAs
-    e = st.number_input("PAs (mmHg)", min_value=0, max_value=300, value=0, step=1)
+    e = st.number_input("PAs (mmHg)", min_value=0, max_value=350, value=120, step=1)
     
     # Input f: FC
-    f = st.number_input("Frecuencia cardiaca (lpm)", min_value=0, max_value=300, value=0, step=1)
+    f = st.number_input("Frecuencia cardiaca (lpm)", min_value=0, max_value=250, value=80, step=1)
     
     # Input g: Temperatura
-    g = st.number_input("Temperatura (ºC)", min_value=20.0, max_value=45.0, value=36.5, step=0.1)
+    g = st.number_input("Temperatura (ºC)", min_value=30.0, max_value=45.0, value=36.5, step=0.1)
     
     # Input h: Nivel de consciencia
     h = st.selectbox(
-        "¿Alteración del nivel de consciencia?",
+        "¿Existe alteración del nivel de consciencia?",
         options=[None, 1, 2],
-        format_func=lambda x: "1.- No" if x == 1 else "2.- Sí" if x == 2 else "Selecciona...",
+        format_func=lambda x: "No" if x == 1 else "Sí" if x == 2 else "Selecciona...",
         index=0
     )
     
