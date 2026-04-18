@@ -359,7 +359,11 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
 
     # Menú desplegable en la zona central
     opcion_cfs_simpl = st.selectbox(
-        "Selecciona la opción que mejor describa al paciente:",
+        """
+        <h2 style="color:#003366;">
+            Responda respecto a la situación del paciente en las últimas 2 semanas)
+        </h2>
+        """,
         options=[
             "Enfermedad terminal con expectativa de vida < 6 meses",
             "Completamente dependiente y se aproxima al final de su vida",
