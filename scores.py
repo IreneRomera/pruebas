@@ -428,8 +428,6 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
             f1, f2, f3, f4, f5, f6, f7, f8, f9
         )
 
-        if cfs_simpl is not None:
-            st.write(f"El Clinical Frailty Score es de **{cfs_simpl}** puntos")
         st.info(desc_simpl)
 
 
