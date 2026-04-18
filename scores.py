@@ -1,3 +1,4 @@
+
 import streamlit as st
 from datetime import datetime
 from streamlit_extras.buy_me_a_coffee import button
@@ -93,55 +94,25 @@ def calcular_cfs_por_preguntas(c1, c2, c3, c4):
         return None, "No se ha podido asignar un CFS con esta combinación."
 
 
-def calcular_cfs_simplificado(
-    f1, f2, f3, f4, f5, f6, f7, f8, f9
-):
+def calcular_cfs_simplificado(opcion):
     """
-    Versión simplificada tipo flowchart.
-    Recibe 'Sí' / 'No' en cada pregunta (f1...f9).
-    Devuelve (cfs, texto_descriptivo).
-    El orden es importante: la primera respuesta 'Sí' marca el CFS.
+    Recibe un código de opción (f1..f9) y devuelve (cfs, descripción).
+    El orden respeta el flowchart clásico del CFS: la primera opción aplicable marca el CFS.
     """
 
-    # 1) Enfermedad terminal < 6 meses
-    if f1 == "Sí":
-        return 9, "CFS 9. Paciente terminal."
+    mapa = {
+        "f1": (9, "CFS 9. Paciente terminal."),
+        "f2": (8, "CFS 8. Paciente severamente frágil."),
+        "f3": (7, "CFS 7. Paciente gravemente frágil."),
+        "f4": (6, "CFS 6. Paciente moderadamente frágil."),
+        "f5": (5, "CFS 5. Paciente ligeramente frágil."),
+        "f6": (4, "CFS 4. Paciente vulnerable."),
+        "f7": (3, "CFS 3. Paciente con buena autonomía."),
+        "f8": (2, "CFS 2. Paciente con buen estado de salud."),
+        "f9": (1, "CFS 1. Paciente en óptimo estado de salud."),
+    }
 
-    # 2) Completamente dependiente y se aproxima al final de la vida
-    if f2 == "Sí":
-        return 8, "CFS 8. Paciente severamente frágil."
-
-    # 3) Completamente dependiente para cuidado personal y ABVD
-    if f3 == "Sí":
-        return 7, "CFS 7. Paciente gravemente frágil."
-
-    # 4) Necesita ayuda con todas las actividades fuera de casa / hogar / baño
-    if f4 == "Sí":
-        return 6, "CFS 6. Paciente moderadamente frágil."
-
-    # 5) Necesita ayuda para AIVD (finanzas, transporte, hogar, comida, medicación)
-    if f5 == "Sí":
-        return 5, "CFS 5. Paciente ligeramente frágil."
-
-    # 6) No dependiente pero los síntomas limitan la vida diaria
-    if f6 == "Sí":
-        return 4, "CFS 4. Paciente vulnerable."
-
-    # 7) Problemas de salud bien controlados y ejercicio más allá de caminar
-    if f7 == "Sí":
-        return 3, "CFS 3. Paciente con buena autonomía."
-
-    # 8) Sin síntomas activos y ejercicio ocasional
-    if f8 == "Sí":
-        return 2, "CFS 2. Paciente con buen estado de salud."
-
-    # 9) Ejercicio regular, más “fitness” de lo esperado para la edad
-    if f9 == "Sí":
-        return 1, "CFS 1. Paciente en óptimo estado de salud."
-
-    # Si todo es "No"
-    return None, "No se ha podido asignar un CFS simplificado con esta combinación de respuestas."
-
+    return mapa.get(opcion, (None, "No se ha podido asignar un CFS simplificado con esta opción."))
 
 
 def calcular_news2(
@@ -264,6 +235,7 @@ def calcular_news2(
     return score, msg
 
 
+
 # ------------------------------
 # Barra lateral: datos del paciente
 # ------------------------------
@@ -283,6 +255,9 @@ ID = f"PAC-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 paciente = Paciente(ID, edad, genero)
 
 st.sidebar.markdown("---")
+
+
+
 
 # ------------------------------
 # Elegir SCORE
@@ -369,67 +344,36 @@ if score_elegido == "Clinical Frailty Scale (CFS)":
 # ------------------------------
 # CFS simplificado (flowchart)
 # ------------------------------
-if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
+if score_elegido == "Clinical Frailty Scale (CFS)":
     st.markdown("---")
     st.subheader("CFS simplificado (flowchart)")
 
-    st.sidebar.subheader("CFS simplificado")
+    st.sidebar.subheader("CFS simplificado (flowchart)")
 
-    f1 = st.sidebar.radio(
-        "¿Enfermedad terminal con expectativa de vida < 6 meses?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f1",
-    )
-    f2 = st.sidebar.radio(
-        "¿Completamente dependiente y se aproxima al final de su vida?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f2",
-    )
-    f3 = st.sidebar.radio(
-        "¿Completamente dependiente para el cuidado personal y ABVD?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f3",
-    )
-    f4 = st.sidebar.radio(
-        "¿Necesita ayuda con todas las actividades fuera de casa, hogar y/o baño?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f4",
-    )
-    f5 = st.sidebar.radio(
-        "¿Necesita ayuda para las AIVD (finanzas, transporte, cuidado del hogar, comida, medicación)?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f5",
-    )
-    f6 = st.sidebar.radio(
-        "¿No es dependiente pero los síntomas limitan su vida diaria?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f6",
-    )
-    f7 = st.sidebar.radio(
-        "¿Tiene problemas de salud bien controlados y realiza ejercicio más allá de caminar?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f7",
-    )
-    f8 = st.sidebar.radio(
-        "¿Sin síntomas activos y realiza ejercicio ocasional?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f8",
-    )
-    f9 = st.sidebar.radio(
-        "¿Realiza ejercicio regular y está más ágil/‘fit’ de lo esperado para su edad?",
-        options=["No", "Sí"],
-        key="cfs_simpl_f9",
+    opcion_cfs_simpl = st.sidebar.selectbox(
+        "Selecciona la opción que mejor describa al paciente:",
+        options=[
+            "f1 - Enfermedad terminal con expectativa de vida < 6 meses",
+            "f2 - Completamente dependiente y se aproxima al final de su vida",
+            "f3 - Completamente dependiente para el cuidado personal y ABVD",
+            "f4 - Necesita ayuda con todas las actividades fuera de casa, hogar y/o baño",
+            "f5 - Necesita ayuda para AIVD (finanzas, transporte, hogar, comida, medicación)",
+            "f6 - No es dependiente pero los síntomas limitan su vida diaria",
+            "f7 - Problemas de salud bien controlados y ejercicio más allá de caminar",
+            "f8 - Sin síntomas activos y realiza ejercicio ocasional",
+            "f9 - Realiza ejercicio regular y está más ágil/'fit' de lo esperado para su edad",
+        ],
     )
 
     boton_cfs_simpl = st.sidebar.button("Calcular CFS simplificado")
 
     if boton_cfs_simpl:
-        cfs_simpl, desc_simpl = calcular_cfs_simplificado(
-            f1, f2, f3, f4, f5, f6, f7, f8, f9
-        )
+        # extraemos el código f1..f9 del inicio del texto
+        codigo = opcion_cfs_simpl.split(" ")[0]   # "f1", "f2", ...
+
+        cfs_simpl, desc_simpl = calcular_cfs_simplificado(codigo)
 
         st.info(desc_simpl)
-
 
 
 # ------------------------------
@@ -526,3 +470,4 @@ button(
 )
 
 
+  
