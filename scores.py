@@ -359,7 +359,7 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
 
     # Menú desplegable en la zona central
     opcion_cfs_simpl = st.selectbox(
-        """
+        f"""
         <h2 style="color:#003366;">
             Responda respecto a la situación del paciente en las últimas 2 semanas)
         </h2>
