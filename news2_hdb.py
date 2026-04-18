@@ -48,10 +48,11 @@ st.markdown("""
 st.title("🏥 NEWS-2 adaptado al Hospital de Barcelona 🏥")
 
 def resetear():
+    # Borra solo las claves que usamos
     for k in ["a", "b", "c", "d", "e", "f", "g", "h", "score", "riesgo"]:
         if k in st.session_state:
             del st.session_state[k]
-    st.rerun()
+    # SIN st.rerun()
 
 @st.cache_data
 def calcular_news2(a, b, c, d, e, f, g, h):
@@ -189,7 +190,12 @@ with st.sidebar:
     with col1:
         st.session_state["calcular_btn"] = st.button("🔢 CALCULAR", use_container_width=True)
     with col2:
-        st.button("🔄 RESETEAR", use_container_width=True, on_click=resetear)
+        st.button(
+            "🔄 RESETEAR",
+            use_container_width=True,
+            on_click=resetear,
+            key="reset_btn"
+            )
 
     st.markdown("---")
     st.markdown("*App desarrollada para uso clínico interno*")
