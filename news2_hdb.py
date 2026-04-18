@@ -12,15 +12,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Inicializar estado
+# --- INICIALIZAR ESTADO BÁSICO ------------------------------------
 if "score" not in st.session_state:
     st.session_state["score"] = None
 if "riesgo" not in st.session_state:
     st.session_state["riesgo"] = None
-if "calcular_btn" not in st.session_state:
-    st.session_state["calcular_btn"] = False
-if "do_reset" not in st.session_state:
-    st.session_state["do_reset"] = False
+# ------------------------------------------------------------------
 
 # CSS
 st.markdown("""
@@ -51,13 +48,9 @@ st.markdown("""
 
 st.title("🏥 NEWS-2 adaptado al Hospital de Barcelona 🏥")
 
-# --- RESET ---------------------------------------------------------
+# --- FUNCIÓN RESET MUY SIMPLE -------------------------------------
 def resetear():
-    # Marcamos que hay que resetear en el próximo rerun
-    st.session_state["do_reset"] = True
-
-# Aplicar reset ANTES de crear los widgets
-if st.session_state.get("do_reset", False):
+    # Valores por defecto de cada widget
     st.session_state["a"] = None      # soporte O2
     st.session_state["b"] = 15        # FR
     st.session_state["c"] = None      # EPOC
@@ -67,11 +60,10 @@ if st.session_state.get("do_reset", False):
     st.session_state["g"] = 36.5      # Temperatura
     st.session_state["h"] = None      # Consciencia
 
+    # Quitar resultado
     st.session_state["score"] = None
     st.session_state["riesgo"] = None
-    st.session_state["calcular_btn"] = False
-    st.session_state["do_reset"] = False
-# -------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 @st.cache_data
 def calcular_news2(a, b, c, d, e, f, g, h):
@@ -174,7 +166,7 @@ def calcular_news2(a, b, c, d, e, f, g, h):
 
     return contador, riesgo
 
-# Sidebar
+# ----------------- SIDEBAR ----------------------------------------
 with st.sidebar:
     st.markdown("### 📊 Introducir datos clínicos del paciente")
 
@@ -182,32 +174,69 @@ with st.sidebar:
         "¿Precisa soporte con O₂?",
         options=[None, 1, 2],
         format_func=lambda x: "No" if x == 1 else "Sí" if x == 2 else "Selecciona...",
-        index=0,
+        index=0 if "a" not in st.session_state or st.session_state["a"] is None else [None,1,2].index(st.session_state["a"]),
         key="a"
     )
-    b = st.number_input("Frecuencia respiratoria (rpm)", min_value=0, max_value=45, value=15, step=1, key="b")
+
+    b = st.number_input(
+        "Frecuencia respiratoria (rpm)",
+        min_value=0, max_value=45,
+        value=st.session_state.get("b", 15),
+        step=1,
+        key="b"
+    )
+
     c = st.selectbox(
         "¿Paciente con enfermedad pulmonar obstructiva crónica (EPOC)?",
         options=[None, 1, 2],
         format_func=lambda x: "No" if x == 1 else "Sí" if x == 2 else "Selecciona...",
-        index=0,
+        index=0 if "c" not in st.session_state or st.session_state["c"] is None else [None,1,2].index(st.session_state["c"]),
         key="c"
     )
-    d = st.number_input("SpO₂ (%)", min_value=0, max_value=100, value=95, step=1, key="d")
-    e = st.number_input("PAs (mmHg)", min_value=0, max_value=350, value=120, step=1, key="e")
-    f = st.number_input("Frecuencia cardiaca (lpm)", min_value=0, max_value=250, value=80, step=1, key="f")
-    g = st.number_input("Temperatura (ºC)", min_value=30.0, max_value=45.0, value=36.5, step=0.1, key="g")
+
+    d = st.number_input(
+        "SpO₂ (%)",
+        min_value=0, max_value=100,
+        value=st.session_state.get("d", 95),
+        step=1,
+        key="d"
+    )
+
+    e = st.number_input(
+        "PAs (mmHg)",
+        min_value=0, max_value=350,
+        value=st.session_state.get("e", 120),
+        step=1,
+        key="e"
+    )
+
+    f = st.number_input(
+        "Frecuencia cardiaca (lpm)",
+        min_value=0, max_value=250,
+        value=st.session_state.get("f", 80),
+        step=1,
+        key="f"
+    )
+
+    g = st.number_input(
+        "Temperatura (ºC)",
+        min_value=30.0, max_value=45.0,
+        value=st.session_state.get("g", 36.5),
+        step=0.1,
+        key="g"
+    )
+
     h = st.selectbox(
         "¿Existe alteración del nivel de consciencia?",
         options=[None, 1, 2],
         format_func=lambda x: "No" if x == 1 else "Sí" if x == 2 else "Selecciona...",
-        index=0,
+        index=0 if "h" not in st.session_state or st.session_state["h"] is None else [None,1,2].index(st.session_state["h"]),
         key="h"
     )
 
     col1, col2 = st.columns(2)
     with col1:
-        st.session_state["calcular_btn"] = st.button("🔢 CALCULAR", use_container_width=True)
+        calcular = st.button("🔢 CALCULAR", use_container_width=True)
     with col2:
         st.button(
             "🔄 RESETEAR",
@@ -218,11 +247,11 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("*App desarrollada para uso clínico interno*")
+# ------------------------------------------------------------------
 
 # Cálculo
-if st.session_state.get("calcular_btn", False):
+if calcular:
     score, riesgo = calcular_news2(a, b, c, d, e, f, g, h)
-
     if score is None:
         st.error("❌ Completa todos los campos antes de calcular.")
     else:
