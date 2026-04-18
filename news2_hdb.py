@@ -4,6 +4,7 @@
 import streamlit as st
 from streamlit_extras.buy_me_a_coffee import button
 
+# Configuración de página
 st.set_page_config(
     page_title="NEWS-2 Hospital de Barcelona",
     page_icon="🏥",
@@ -11,6 +12,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Inicializar estado
+if "score" not in st.session_state:
+    st.session_state["score"] = None
+if "riesgo" not in st.session_state:
+    st.session_state["riesgo"] = None
+
+# CSS
 st.markdown("""
 <style>
 .sidebar .sidebar-content {
@@ -37,12 +45,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-if "score" not in st.session_state:
-    st.session_state["score"] = False
-if "riesgo" not in st.session_state:
-    st.session_state["riesgo"] = None
-
-
 st.title("🏥 NEWS-2 adaptado al Hospital de Barcelona 🏥")
 
 def resetear():
@@ -58,9 +60,11 @@ def calcular_news2(a, b, c, d, e, f, g, h):
 
     contador = 0
 
+    # Soporte O2
     if a == 2:
         contador += 2
 
+    # FR
     if 12 <= b <= 20:
         contador += 0
     elif 21 <= b <= 24:
@@ -72,6 +76,7 @@ def calcular_news2(a, b, c, d, e, f, g, h):
     elif b < 9:
         contador += 3
 
+    # SpO2 con EPOC
     if c == 1:
         if d > 95:
             contador += 0
@@ -97,6 +102,7 @@ def calcular_news2(a, b, c, d, e, f, g, h):
         elif d < 84:
             contador += 3
 
+    # PAs
     if e > 219:
         contador += 3
     elif 111 <= e <= 219:
@@ -108,6 +114,7 @@ def calcular_news2(a, b, c, d, e, f, g, h):
     elif e < 91:
         contador += 3
 
+    # FC
     if f > 130:
         contador += 3
     elif 111 <= f <= 130:
@@ -121,6 +128,7 @@ def calcular_news2(a, b, c, d, e, f, g, h):
     elif f < 41:
         contador += 3
 
+    # Temperatura
     if g > 39:
         contador += 2
     elif 38.1 <= g <= 39:
@@ -132,9 +140,11 @@ def calcular_news2(a, b, c, d, e, f, g, h):
     elif g < 35.1:
         contador += 3
 
+    # Conciencia
     if h == 2:
         contador += 3
 
+    # Interpretación
     if contador >= 5:
         riesgo = "⚠️ Riesgo ALTO - Valoración emergente (<1h). Avisar Medicina Intensiva (6457)"
     elif contador == 4:
@@ -146,6 +156,7 @@ def calcular_news2(a, b, c, d, e, f, g, h):
 
     return contador, riesgo
 
+# Sidebar
 with st.sidebar:
     st.markdown("### 📊 Introducir datos clínicos del paciente")
 
@@ -156,9 +167,7 @@ with st.sidebar:
         index=0,
         key="a"
     )
-
     b = st.number_input("Frecuencia respiratoria (rpm)", min_value=0, max_value=45, value=15, step=1, key="b")
-
     c = st.selectbox(
         "¿Paciente con enfermedad pulmonar obstructiva crónica (EPOC)?",
         options=[None, 1, 2],
@@ -166,12 +175,10 @@ with st.sidebar:
         index=0,
         key="c"
     )
-
     d = st.number_input("SpO₂ (%)", min_value=0, max_value=100, value=95, step=1, key="d")
     e = st.number_input("PAs (mmHg)", min_value=0, max_value=350, value=120, step=1, key="e")
     f = st.number_input("Frecuencia cardiaca (lpm)", min_value=0, max_value=250, value=80, step=1, key="f")
     g = st.number_input("Temperatura (ºC)", min_value=30.0, max_value=45.0, value=36.5, step=0.1, key="g")
-
     h = st.selectbox(
         "¿Existe alteración del nivel de consciencia?",
         options=[None, 1, 2],
@@ -189,17 +196,19 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("*App desarrollada para uso clínico interno*")
 
+# Cálculo
 if calcular:
     score, riesgo = calcular_news2(a, b, c, d, e, f, g, h)
     if score is None:
         st.error("❌ Completa todos los campos antes de calcular.")
     else:
-        st.session_state.score = score
-        st.session_state.riesgo = riesgo
+        st.session_state["score"] = score
+        st.session_state["riesgo"] = riesgo
 
-if "score" in st.session_state and st.session_state.score is not None:
-    st.markdown(f'<div class="main-result">{st.session_state.score}</div>', unsafe_allow_html=True)
-    st.markdown(f"### {st.session_state.riesgo}")
+# Resultado
+if st.session_state.get("score") is not None:
+    st.markdown(f'<div class="main-result">{st.session_state["score"]}</div>', unsafe_allow_html=True)
+    st.markdown(f"### {st.session_state['riesgo']}")
 
     st.subheader("📋 Resumen de parámetros")
     data = {
@@ -214,7 +223,7 @@ st.markdown("---")
 st.markdown("*Desarrollado para uso clínico. Validar siempre con criterio médico.*")
 
 st.caption("App desarrollada por Irene Romera / irene.r.s@outlook.com")
-st.write("Si esta calculadora te resulta útil …")
+st.write("Si esta calculadora te resulta útil…")
 
 button(
     username="ireneromera",
