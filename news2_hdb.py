@@ -189,7 +189,7 @@ with st.sidebar:
 
     col1, col2 = st.columns(2)
     with col1:
-        calcular = st.button("🔢 CALCULAR", use_container_width=True)
+        st.session_state["calcular_btn"] = st.button("🔢 CALCULAR", use_container_width=True)
     with col2:
         st.button("🔄 RESETEAR", use_container_width=True, on_click=resetear)
 
@@ -197,8 +197,13 @@ with st.sidebar:
     st.markdown("*App desarrollada para uso clínico interno*")
 
 # Cálculo
-if calcular:
-    score, riesgo = calcular_news2(a, b, c, d, e, f, g, h)
+if st.session_state.get("calcular_btn", False):
+    try:
+        score, riesgo = calcular_news2(a, b, c, d, e, f, g, h)
+    except Exception as e:
+        st.error(f"❌ Error en el cálculo: {e}")
+        score, riesgo = None, None
+
     if score is None:
         st.error("❌ Completa todos los campos antes de calcular.")
     else:
