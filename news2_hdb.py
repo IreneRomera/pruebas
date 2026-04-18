@@ -37,6 +37,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+if "score" not in st.session_state:
+    st.session_state["score"] = False
+if "riesgo" not in st.session_state:
+    st.session_state["riesgo"] = None
+
+
 st.title("🏥 NEWS-2 adaptado al Hospital de Barcelona 🏥")
 
 def resetear():
