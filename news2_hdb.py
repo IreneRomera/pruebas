@@ -6,11 +6,6 @@ Created on Sat Apr 18 17:03:42 2026
 @author: Prunebelly
 """
 
-"""
-Calculadora NEWS-2 adaptado al Hospital de Barcelona
-App Streamlit minimalista
-"""
-
 import streamlit as st
 from datetime import datetime
 from streamlit_extras.buy_me_a_coffee import button
