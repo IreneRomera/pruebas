@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -242,6 +243,40 @@ def calcular_news2(
     return score, msg
 
 
+def calcular_qsofa(alteracion_consciencia, pam_menor_100, fr_mayor_22):
+    """
+    Calcula qSOFA según los 3 criterios:
+    - Alteración del nivel de consciencia
+    - PAM ≤ 100 mmHg  
+    - FR ≥ 22 rpm
+    Devuelve (score, interpretacion)
+    """
+    score = 0
+    
+    if alteracion_consciencia == "Sí":
+        score += 1
+    if pam_menor_100 == "Sí":
+        score += 1
+    if fr_mayor_22 == "Sí":
+        score += 1
+    
+    if score == 1:
+        interpretacion = (
+            "Se recomienda repetir el qSOFA frecuentemente y continuar evaluando al paciente."
+        )
+    elif score >= 2:
+        interpretacion = (
+            "Se recomienda vigilar la aparición de disfunción orgánica y establecer las "
+            "medidas diagnósticas y terapéuticas necesarias. Mayor riesgo de mortalidad "
+            "hospitalaria o prolongada estancia en pacientes con sospecha de infección."
+        )
+    else:
+        interpretacion = "qSOFA negativo. Continuar con vigilancia rutinaria."
+    
+    return score, interpretacion
+
+
+
 
 # ------------------------------
 # Barra lateral: datos del paciente
@@ -284,7 +319,7 @@ score_elegido = st.sidebar.selectbox(
         "Clinical Frailty Scale (CFS)",
         "Clinical Frailty Scale (CFS) flowchart",
         "NEWS-2",
-        # futuros scores…
+        "qSOFA",  
     ],
 )
 
@@ -293,7 +328,7 @@ score_elegido = st.sidebar.selectbox(
 # Clinical Frailty Scale (CFS)
 # ------------------------------
 if score_elegido == "Clinical Frailty Scale (CFS)":
-    st.sidebar.subheader("Preguntas para CFS (respecto a las últimas 2 semanas)")
+    st.sidebar.subheader("Responda respecto a la situación del paciente en las últimas 2 semanas)")
 
     c1 = st.sidebar.selectbox(
         "Patología de base",
@@ -391,6 +426,7 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
 
     st.info(desc_simpl)
 
+
 # ------------------------------
 # NEWS-2
 # ------------------------------
@@ -471,6 +507,60 @@ if score_elegido == "NEWS-2":
         st.info(mensaje)
 
 
+# ------------------------------
+# qSOFA - NUEVO
+# ------------------------------
+if score_elegido == "qSOFA":
+    st.sidebar.subheader("Parámetros para qSOFA")
+    
+    alteracion_consciencia_qsofa = st.sidebar.radio(
+        "¿Existe alteración del nivel de consciencia?",
+        options=["No", "Sí"],
+    )
+    
+    pam_menor_100 = st.sidebar.radio(
+        "¿La PAM es ≤ 100 mmHg?",
+        options=["No", "Sí"],
+    )
+    
+    fr_mayor_22 = st.sidebar.radio(
+        "¿La FR es ≥ 22 rpm?",
+        options=["No", "Sí"],
+    )
+    
+    boton_qsofa = st.sidebar.button("Calcular qSOFA")
+    
+    if boton_qsofa:
+        qsofa_score, interpretacion = calcular_qsofa(
+            alteracion_consciencia_qsofa,
+            pam_menor_100,
+            fr_mayor_22
+        )
+        
+        st.subheader("qSOFA")
+        
+        # Información previa (siempre visible al calcular)
+        with st.expander("ℹ️ Información sobre qSOFA", expanded=True):
+            st.info("""
+            **El qSOFA tiene una sensibilidad baja para el diagnóstico de sepsis** en 
+            comparación para otras escalas, por lo que **no se recomienda como herramienta 
+            única de cribado de sepsis** en el paciente hospitalizado. 
+            
+            No obstante, se considera una **buena herramienta para detectar el deterioro 
+            clínico general** de los pacientes y como predictor de mortalidad y/o estancia 
+            prolongada en UCI en pacientes con una infección sospechada o confirmada. 
+            
+            **Un qSOFA positivo debe activar una evaluación clínica inmediata** y la 
+            búsqueda de una posible disfunción orgánica.
+            """)
+        
+        # Resultado
+        st.success(f"**El qSOFA score es de {qsofa_score} puntos**")
+        st.info(interpretacion)
+
+
+
+
 st.markdown("---")
 st.caption("App desarrollada por Irene Romera / irene.r.s@outlook.com")
 st.write("Si esta calculadora te resulta útil …")
@@ -486,9 +576,3 @@ button(
 
 
         
-# generar un botón para calcular "Clinical Frailty Score" --> def CFSquestions(self)
-# generar un botón para calcular "NEWS-2" --> def get_news2(self)
-# generar un botón para calcular "qSOFA" -->
-# generar un botón para calcular "SOFA score" -->
-# generar un botón para calcular "APACHE-II score" -->
-# generar un botón para calcular "TEP: ..........." -->
