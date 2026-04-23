@@ -267,7 +267,7 @@ def calcular_qsofa(alteracion_consciencia, pam_menor_100, fr_mayor_22):
     elif score >= 2:
         interpretacion = (
             "Se recomienda vigilar la aparición de disfunción orgánica y establecer las "
-            "medidas diagnósticas y terapéuticas necesarias. Mayor riesgo de mortalidad "
+            "medidas diagnósticas y terapéuticas necesarias. Existe mayor riesgo de mortalidad "
             "hospitalaria o prolongada estancia en pacientes con sospecha de infección."
         )
     else:
