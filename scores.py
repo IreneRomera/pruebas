@@ -842,11 +842,11 @@ if score_elegido == "SOFA score":
     hemodinamica_opcion = st.sidebar.selectbox(
         "Situación hemodinámica del paciente",
         options=[
-            "Ausencia de hipotensión",
-            "PAm < 70 mmHg sin soporte",
-            "DPM < 5 o DBT",
-            "DPM > 5 o NAD < 0.1 o ADR < 0.1",
-            "DPM > 15 o NAD > 0.1 o ADR > 0.1",
+            "1) Ausencia de hipotensión",
+            "2) PAM < 70 mmHg",
+            "3) DPM < 5 o DBT",
+            "4) DPM > 5 o NAD < 0.1 o ADR < 0.1",
+            "5) DPM > 15 o NAD > 0.1 o ADR > 0.1",
         ],
     )
     hemodinamica = int(hemodinamica_opcion.split(")")[0])
@@ -855,11 +855,11 @@ if score_elegido == "SOFA score":
     creatinina_opcion = st.sidebar.selectbox(
         "Creatinina sérica",
         options=[
-            "< 1.2 mg/dL (< 110 µmol/L)",
-            "1.2 - 1.9 mg/dL (110-170 µmol/L)",
-            "2 - 3.4 mg/dL (171-299 µmol/L)",
-            "3.5 - 4.9 mg/dL (300-439 µmol/L) o diuresis < 500 mL/día",
-            "> 5 mg/dL (> 440 µmol/L) o diuresis < 200 mL/día",
+            "1) < 1.2 mg/dL (< 110 µmol/L)",
+            "2) 1.2 - 1.9 mg/dL (110-170 µmol/L)",
+            "3) 2 - 3.4 mg/dL (171-299 µmol/L)",
+            "4) 3.5 - 4.9 mg/dL (300-439 µmol/L) o diuresis < 500 mL/día",
+            "5) > 5 mg/dL (> 440 µmol/L) o diuresis < 200 mL/día",
         ],
     )
     creatinina = int(creatinina_opcion.split(")")[0])
@@ -868,11 +868,11 @@ if score_elegido == "SOFA score":
     bilirrubina_opcion = st.sidebar.selectbox(
         "Bilirrubina sérica",
         options=[
-            "< 1.2 mg/dL (< 20 µmol/L)",
-            "1.2 - 1.9 mg/dL (20-32 µmol/L)",
-            "2 - 5.9 mg/dL (32-101 µmol/L)",
-            "6 - 11.9 mg/dL (102-204 µmol/L)",
-            "> 12 mg/dL (> 205 µmol/L)",
+            "1) < 1.2 mg/dL (< 20 µmol/L)",
+            "2) 1.2 - 1.9 mg/dL (20-32 µmol/L)",
+            "3) 2 - 5.9 mg/dL (32-101 µmol/L)",
+            "4) 6 - 11.9 mg/dL (102-204 µmol/L)",
+            "5) > 12 mg/dL (> 205 µmol/L)",
         ],
     )
     bilirrubina = int(bilirrubina_opcion.split(")")[0])
@@ -881,11 +881,11 @@ if score_elegido == "SOFA score":
     plaquetas_opcion = st.sidebar.selectbox(
         "Plaquetas (x10³/mcL)",
         options=[
-            "≥ 150",
-            "150 - 100",
-            "99 - 50",
-            "49 - 20",
-            "< 20",
+            "1) ≥ 150",
+            "2) 150 - 100",
+            "3) 99 - 50",
+            "4) 49 - 20",
+            "5) < 20",
         ],
     )
     plaquetas = int(plaquetas_opcion.split(")")[0])
