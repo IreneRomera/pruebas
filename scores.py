@@ -276,6 +276,230 @@ def calcular_qsofa(alteracion_consciencia, pam_menor_100, fr_mayor_22):
     return score, interpretacion
 
 
+def calcular_sofa(
+    gcs,
+    tipo_relacion,          # "SaO2/FiO2" o "PaO2/FiO2"
+    relacion,
+    hemodinamica,          # 1-5
+    creatinina,            # 1-5
+    bilirrubina,           # 1-5
+    plaquetas              # 1-5
+):
+    """
+    Calcula el SOFA total y devuelve:
+    - score total
+    - texto sobre la mortalidad esperada
+    """
+    score = 0
+
+    # A) GCS
+    if gcs == 15:
+        score += 0
+    elif gcs in (13, 14):
+        score += 1
+    elif 10 <= gcs < 13:
+        score += 2
+    elif 6 <= gcs < 10:
+        score += 3
+    elif gcs < 6:
+        score += 4
+
+    # B) SaFi o PaFi
+    if tipo_relacion == "SaO₂/FiO₂":
+        # Usamos los mismos puntos que tu código original
+        if relacion > 512:
+            score += 0
+        elif 357 <= relacion <= 512:
+            score += 1
+        elif 214 <= relacion < 357:
+            score += 2
+        elif 89 <= relacion < 214:
+            score += 3
+        elif relacion < 89:
+            score += 4
+    else:  # PaO2/FiO2
+        if relacion >= 400:
+            score += 0
+        elif 300 <= relacion < 400:
+            score += 1
+        elif 200 <= relacion < 300:
+            score += 2
+        elif 100 <= relacion < 200:
+            score += 3
+        elif relacion < 100:
+            score += 4
+
+    # C) Hemodinámica (1-5 tal como en tu código)
+    if hemodinamica == 1:
+        score += 0
+    elif hemodinamica == 2:
+        score += 1
+    elif hemodinamica == 3:
+        score += 2
+    elif hemodinamica == 4:
+        score += 3
+    elif hemodinamica == 5:
+        score += 4
+
+    # D) Creatinina
+    if creatinina == 1:
+        score += 0
+    elif creatinina == 2:
+        score += 1
+    elif creatinina == 3:
+        score += 2
+    elif creatinina == 4:
+        score += 3
+    elif creatinina == 5:
+        score += 4
+
+    # E) Bilirrubina
+    if bilirrubina == 1:
+        score += 0
+    elif bilirrubina == 2:
+        score += 1
+    elif bilirrubina == 3:
+        score += 2
+    elif bilirrubina == 4:
+        score += 3
+    elif bilirrubina == 5:
+        score += 4
+
+    # F) Plaquetas
+    if plaquetas == 1:
+        score += 0
+    elif plaquetas == 2:
+        score += 1
+    elif plaquetas == 3:
+        score += 2
+    elif plaquetas == 4:
+        score += 3
+    elif plaquetas == 5:
+        score += 4
+
+    # Estimación de mortalidad aproximada
+    if score <= 4:
+        mortalidad = "Mortalidad esperada aproximada 5–10%."
+    elif 5 <= score <= 5:
+        mortalidad = "Mortalidad esperada aproximada al menos 10–20%."
+    elif 6 <= score <= 8:
+        mortalidad = "Mortalidad esperada aproximada 20–33%."
+    elif 9 <= score <= 11:
+        mortalidad = "Mortalidad esperada aproximada 40–50%."
+    elif 12 <= score <= 14:
+        mortalidad = "Mortalidad esperada aproximada 60–75%."
+    else:  # >= 15
+        mortalidad = "La mortalidad esperada es superior al 90%."
+
+    return score, (
+        "El aumento del SOFA score en las últimas 48 h supone un aumento de mortalidad "
+        "de al menos el 50%. " + mortalidad
+    )
+
+def contar_disfuncion_leve(
+    gcs,
+    tipo_relacion,
+    relacion,
+    hemodinamica,
+    creatinina,
+    bilirrubina,
+    plaquetas,
+):
+    """
+    Reproduce tu lógica original de 'disfunción leve':
+    - cuenta órganos con puntuación 2 (c, d, e, f)
+    - +1 si PaFi entre 200-300 (equivalente a score 2 respiratorio)
+    - +1 si GCS 12-14 (equivalente a score 1-2 neurológico, tú usabas >=12 y <15)
+    """
+    contador = 0
+
+    # c, d, e, f = 2
+    for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
+        if valor == 2:
+            contador += 1
+
+    # Respiratorio
+    if tipo_relacion == "PaO₂/FiO₂":
+        if 200 < relacion <= 300:
+            contador += 1
+    else:
+        # No tenías definición explícita de disfunción leve con SaFi;
+        # si quieres podríamos añadir un criterio equivalente más adelante.
+        pass
+
+    # Neurológico
+    if 12 <= gcs < 15:
+        contador += 1
+
+    return contador
+
+
+def contar_disfuncion_grave(
+    gcs,
+    tipo_relacion,
+    relacion,
+    hemodinamica,
+    creatinina,
+    bilirrubina,
+    plaquetas,
+):
+    """
+    Tu lógica de 'disfunción grave':
+    - cuenta órganos con puntuación 3 (c, d, e, f)
+    - +1 si PaFi entre 100-200
+    - +1 si GCS entre 6-9
+    """
+    contador = 0
+
+    for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
+        if valor == 3:
+            contador += 1
+
+    if tipo_relacion == "PaO₂/FiO₂":
+        if 100 <= relacion <= 200:
+            contador += 1
+
+    if 6 <= gcs < 10:
+        contador += 1
+
+    return contador
+
+
+def contar_fallo_organico(
+    gcs,
+    tipo_relacion,
+    relacion,
+    hemodinamica,
+    creatinina,
+    bilirrubina,
+    plaquetas,
+):
+    """
+    Tu lógica de 'fallo':
+    - cuenta órganos con puntuación 4 o 5 (c, d, e, f)
+    - +1 si PaFi < 100
+    - +1 si GCS < 6
+    """
+    contador = 0
+
+    for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
+        if valor in (4, 5):
+            contador += 1
+
+    if tipo_relacion == "PaO₂/FiO₂":
+        if relacion < 100:
+            contador += 1
+
+    if gcs < 6:
+        contador += 1
+
+    return contador
+
+
+
+
+
+
 
 
 # ------------------------------
@@ -320,6 +544,7 @@ score_elegido = st.sidebar.selectbox(
         "Clinical Frailty Scale (CFS) flowchart",
         "NEWS-2",
         "qSOFA",  
+        "SOFA score",
     ],
 )
 
@@ -508,7 +733,7 @@ if score_elegido == "NEWS-2":
 
 
 # ------------------------------
-# qSOFA - NUEVO
+# qSOFA 
 # ------------------------------
 if score_elegido == "qSOFA":
     st.sidebar.subheader("Parámetros para qSOFA")
@@ -559,6 +784,177 @@ if score_elegido == "qSOFA":
         st.info(interpretacion)
 
 
+# ------------------------------
+# SOFA score
+# ------------------------------
+if score_elegido == "SOFA score":
+    st.sidebar.subheader("Parámetros para SOFA")
+
+    # GCS
+    gcs = st.sidebar.number_input(
+        "Glasgow Coma Scale (GCS)",
+        min_value=3,
+        max_value=15,
+        value=15,
+        step=1,
+    )
+
+    # Relación SaFi / PaFi
+    tipo_relacion = st.sidebar.radio(
+        "¿Qué relación desea utilizar?",
+        options=["SaO₂/FiO₂", "PaO₂/FiO₂"],
+    )
+
+    if tipo_relacion == "SaO₂/FiO₂":
+        spo2 = st.sidebar.number_input(
+            "SpO₂ (%)",
+            min_value=50,
+            max_value=100,
+            value=96,
+            step=1,
+        )
+        fio2 = st.sidebar.number_input(
+            "FiO₂ (%)",
+            min_value=21,
+            max_value=100,
+            value=21,
+            step=1,
+        )
+        relacion = spo2 / (fio2 / 100.0)
+    else:
+        pao2 = st.sidebar.number_input(
+            "PaO₂ (mmHg)",
+            min_value=30,
+            max_value=600,
+            value=80,
+            step=1,
+        )
+        fio2 = st.sidebar.number_input(
+            "FiO₂ (%)",
+            min_value=21,
+            max_value=100,
+            value=21,
+            step=1,
+        )
+        relacion = pao2 / (fio2 / 100.0)
+
+    # C) Situación hemodinámica
+    hemodinamica_opcion = st.sidebar.selectbox(
+        "Situación hemodinámica del paciente",
+        options=[
+            "1) Ausencia de hipotensión",
+            "2) PAM < 70 mmHg",
+            "3) DPM < 5 o DBT",
+            "4) DPM > 5 o NAD < 0.1 o ADR < 0.1",
+            "5) DPM > 15 o NAD > 0.1 o ADR > 0.1",
+        ],
+    )
+    hemodinamica = int(hemodinamica_opcion.split(")")[0])
+
+    # D) Creatinina
+    creatinina_opcion = st.sidebar.selectbox(
+        "Creatinina sérica",
+        options=[
+            "1) < 1.2 mg/dL (< 110 µmol/L)",
+            "2) 1.2 - 1.9 mg/dL (110-170 µmol/L)",
+            "3) 2 - 3.4 mg/dL (171-299 µmol/L)",
+            "4) 3.5 - 4.9 mg/dL (300-439 µmol/L) o diuresis < 500 mL/día",
+            "5) > 5 mg/dL (> 440 µmol/L) o diuresis < 200 mL/día",
+        ],
+    )
+    creatinina = int(creatinina_opcion.split(")")[0])
+
+    # E) Bilirrubina
+    bilirrubina_opcion = st.sidebar.selectbox(
+        "Bilirrubina sérica",
+        options=[
+            "1) < 1.2 mg/dL (< 20 µmol/L)",
+            "2) 1.2 - 1.9 mg/dL (20-32 µmol/L)",
+            "3) 2 - 5.9 mg/dL (32-101 µmol/L)",
+            "4) 6 - 11.9 mg/dL (102-204 µmol/L)",
+            "5) > 12 mg/dL (> 205 µmol/L)",
+        ],
+    )
+    bilirrubina = int(bilirrubina_opcion.split(")")[0])
+
+    # F) Plaquetas
+    plaquetas_opcion = st.sidebar.selectbox(
+        "Plaquetas (x10³/mcL)",
+        options=[
+            "1) ≥ 150",
+            "2) 150 - 100",
+            "3) 99 - 50",
+            "4) 49 - 20",
+            "5) < 20",
+        ],
+    )
+    plaquetas = int(plaquetas_opcion.split(")")[0])
+
+    boton_sofa = st.sidebar.button("Calcular SOFA")
+
+    if boton_sofa:
+        score_sofa, texto_sofa = calcular_sofa(
+            gcs,
+            tipo_relacion,
+            relacion,
+            hemodinamica,
+            creatinina,
+            bilirrubina,
+            plaquetas,
+        )
+
+        st.subheader("SOFA score")
+
+        with st.expander("ℹ️ Información sobre SOFA", expanded=True):
+            st.info(
+                "El SOFA (Sequential Organ Failure Assessment) evalúa la disfunción de 6 órganos "
+                "(respiratorio, coagulación, hepático, cardiovascular, neurológico y renal). "
+                "Se utiliza para cuantificar la gravedad y como predictor de mortalidad."
+            )
+
+        st.success(f"**El SOFA score es de {score_sofa} puntos**")
+        st.info(texto_sofa)
+
+        # --- Disfunción leve, grave y fallo orgánico ---
+        n_leve = contar_disfuncion_leve(
+            gcs,
+            tipo_relacion,
+            relacion,
+            hemodinamica,
+            creatinina,
+            bilirrubina,
+            plaquetas,
+        )
+        n_grave = contar_disfuncion_grave(
+            gcs,
+            tipo_relacion,
+            relacion,
+            hemodinamica,
+            creatinina,
+            bilirrubina,
+            plaquetas,
+        )
+        n_fallo = contar_fallo_organico(
+            gcs,
+            tipo_relacion,
+            relacion,
+            hemodinamica,
+            creatinina,
+            bilirrubina,
+            plaquetas,
+        )
+
+        st.markdown("### Disfunción / fallo de órganos")
+
+        st.write(
+            f"Existe **disfunción leve** de `{n_leve}` órganos, "
+            f"**disfunción grave** de `{n_grave}` órganos y "
+            f"**fallo** de `{n_fallo}` órganos."
+        )
+
+
+
+
 
 
 st.markdown("---")
@@ -576,3 +972,4 @@ button(
 
 
         
+
