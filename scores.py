@@ -379,24 +379,24 @@ def calcular_sofa(
 
     # Estimación de mortalidad aproximada
     if score <= 4:
-        mortalidad = "Mortalidad esperada aproximada 5–10%."
+        mortalidad = "En este caso la mortalidad esperada aproximada es del 5–10%."
     elif 5 <= score <= 5:
-        mortalidad = "Mortalidad esperada aproximada al menos 10–20%."
+        mortalidad = "En este caso la mortalidad esperada aproximada aes l menos del 10–20%."
     elif 6 <= score <= 8:
-        mortalidad = "Mortalidad esperada aproximada 20–33%."
+        mortalidad = "En este caso la mortalidad esperada aproximada es del 20–33%."
     elif 9 <= score <= 11:
-        mortalidad = "Mortalidad esperada aproximada 40–50%."
+        mortalidad = "En este caso la mortalidad esperada aproximada es del 40–50%."
     elif 12 <= score <= 14:
-        mortalidad = "Mortalidad esperada aproximada 60–75%."
+        mortalidad = "En este caso la mortalidad esperada aproximada es del 60–75%."
     else:  # >= 15
-        mortalidad = "La mortalidad esperada es superior al 90%."
+        mortalidad = "En este caso la mortalidad esperada es superior al 90%."
 
     return score, (
         "El aumento del SOFA score en las últimas 48 h supone un aumento de mortalidad "
         "de al menos el 50%. " + mortalidad
     )
 
-def contar_disfuncion_leve(
+def contar_disfuncion(
     gcs,
     tipo_relacion,
     relacion,
@@ -406,60 +406,30 @@ def contar_disfuncion_leve(
     plaquetas,
 ):
     """
-    Reproduce tu lógica original de 'disfunción leve':
-    - cuenta órganos con puntuación 3 (c, d, e, f)
-    - +1 si PaFi entre 200-300 (equivalente a score 2 respiratorio)
-    - +1 si GCS 12-14 (equivalente a score 1-2 neurológico, tú usabas >=12 y <15)
+    Disfunción (leve+grave unificadas):
+    - cuenta órganos con puntuación 3 o 4 (hemodinámica, creatinina, bilirrubina, plaquetas)
+    - +1 si PaFi entre 100-300 o SaFi entre 89-357 (equivalente a subscore respiratorio 2-3)
+    - +1 si GCS entre 6 y 12 (disfunción neurológica significativa, sin fallo)
     """
     contador = 0
 
-    # c, d, e, f = 2
+    # c, d, e, f = 3 ó 4
     for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
-        if valor == 3:
+        if valor in (3, 4):
             contador += 1
 
     # Respiratorio
     if tipo_relacion == "PaO₂/FiO₂":
-        if 200 < relacion <= 300:
+        # Disfunción respiratoria: PaFi 100-300
+        if 100 < relacion <= 300:
             contador += 1
-    else:
-        # No tenías definición explícita de disfunción leve con SaFi;
-        # si quieres podríamos añadir un criterio equivalente más adelante.
-        pass
+    else:  # SaO₂/FiO₂
+        # Disfunción respiratoria: SaFi 89-357
+        if 89 <= relacion < 357:
+            contador += 1
 
     # Neurológico
-    if 10 <= gcs <= 12:
-        contador += 1
-
-    return contador
-
-
-def contar_disfuncion_grave(
-    gcs,
-    tipo_relacion,
-    relacion,
-    hemodinamica,
-    creatinina,
-    bilirrubina,
-    plaquetas,
-):
-    """
-    Tu lógica de 'disfunción grave':
-    - cuenta órganos con puntuación 4 (c, d, e, f)
-    - +1 si PaFi entre 100-200
-    - +1 si GCS entre 6-9
-    """
-    contador = 0
-
-    for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
-        if valor == 4:
-            contador += 1
-
-    if tipo_relacion == "PaO₂/FiO₂":
-        if 100 <= relacion <= 200:
-            contador += 1
-
-    if 6 <= gcs < 10:
+    if 6 <= gcs <= 12:
         contador += 1
 
     return contador
@@ -475,21 +445,27 @@ def contar_fallo_organico(
     plaquetas,
 ):
     """
-    Tu lógica de 'fallo':
-    - cuenta órganos con puntuación 5 (c, d, e, f)
-    - +1 si PaFi < 100
-    - +1 si GCS < 6
+    Fallo orgánico:
+    - cuenta órganos con puntuación 5 (hemodinámica, creatinina, bilirrubina, plaquetas)
+    - +1 si PaFi < 100 o SaFi < 89 (equivalente a subscore respiratorio 4)
+    - +1 si GCS < 6 (fallo neurológico)
     """
     contador = 0
 
+    # c, d, e, f = 5
     for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
         if valor == 5:
             contador += 1
 
+    # Respiratorio
     if tipo_relacion == "PaO₂/FiO₂":
         if relacion < 100:
             contador += 1
+    else:  # SaO₂/FiO₂
+        if relacion < 89:
+            contador += 1
 
+    # Neurológico
     if gcs < 6:
         contador += 1
 
@@ -916,16 +892,7 @@ if score_elegido == "SOFA score":
         st.info(texto_sofa)
 
         # --- Disfunción leve, grave y fallo orgánico ---
-        n_leve = contar_disfuncion_leve(
-            gcs,
-            tipo_relacion,
-            relacion,
-            hemodinamica,
-            creatinina,
-            bilirrubina,
-            plaquetas,
-        )
-        n_grave = contar_disfuncion_grave(
+        n_disf = contar_disfuncion(
             gcs,
             tipo_relacion,
             relacion,
@@ -947,8 +914,7 @@ if score_elegido == "SOFA score":
         st.markdown("### Disfunción / fallo de órganos")
 
         st.write(
-            f"Existe **disfunción leve** de `{n_leve}` órganos, "
-            f"**disfunción grave** de `{n_grave}` órganos y "
+            f"Existe **disfunción** de `{n_disf}` órganos, "
             f"**fallo** de `{n_fallo}` órganos."
         )
 
