@@ -407,7 +407,7 @@ def contar_disfuncion_leve(
 ):
     """
     Reproduce tu lógica original de 'disfunción leve':
-    - cuenta órganos con puntuación 2 (c, d, e, f)
+    - cuenta órganos con puntuación 3 (c, d, e, f)
     - +1 si PaFi entre 200-300 (equivalente a score 2 respiratorio)
     - +1 si GCS 12-14 (equivalente a score 1-2 neurológico, tú usabas >=12 y <15)
     """
@@ -415,7 +415,7 @@ def contar_disfuncion_leve(
 
     # c, d, e, f = 2
     for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
-        if valor == 2:
+        if valor == 3:
             contador += 1
 
     # Respiratorio
@@ -445,14 +445,14 @@ def contar_disfuncion_grave(
 ):
     """
     Tu lógica de 'disfunción grave':
-    - cuenta órganos con puntuación 3 (c, d, e, f)
+    - cuenta órganos con puntuación 4 (c, d, e, f)
     - +1 si PaFi entre 100-200
     - +1 si GCS entre 6-9
     """
     contador = 0
 
     for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
-        if valor == 3:
+        if valor == 4:
             contador += 1
 
     if tipo_relacion == "PaO₂/FiO₂":
@@ -476,14 +476,14 @@ def contar_fallo_organico(
 ):
     """
     Tu lógica de 'fallo':
-    - cuenta órganos con puntuación 4 o 5 (c, d, e, f)
+    - cuenta órganos con puntuación 5 (c, d, e, f)
     - +1 si PaFi < 100
     - +1 si GCS < 6
     """
     contador = 0
 
     for valor in [hemodinamica, creatinina, bilirrubina, plaquetas]:
-        if valor in (4, 5):
+        if valor == 5:
             contador += 1
 
     if tipo_relacion == "PaO₂/FiO₂":
