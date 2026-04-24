@@ -428,7 +428,7 @@ def contar_disfuncion_leve(
         pass
 
     # Neurológico
-    if 10 <= gcs < 12:
+    if 10 <= gcs <= 12:
         contador += 1
 
     return contador
