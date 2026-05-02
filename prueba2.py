@@ -81,8 +81,8 @@ calculo = st.sidebar.selectbox(
     [
         "Necesidades de sueroterapia",
         "Necesidades de glucosa",
-        "Ajuste del aporte de sodio",
-        "Ajuste del aporte de potasio",
+        "Necesidades de sodio",
+        "Necesidades de potasio",
         "Reposición de sodio",
         "Reposición de potasio",
         "Reposición de calcio",
@@ -210,9 +210,9 @@ if calculo == "Necesidades de glucosa":
 
 
 # ------------------------------
-# 3) Ajuste del aporte de sodio
+# 3) Necesidades de sodio
 # ------------------------------
-if calculo == "Ajuste del aporte de sodio":
+if calculo == "Necesidades de sodio":
     st.sidebar.subheader("Aporte de sodio en 24 h")
 
     suero_tipo = st.sidebar.selectbox(
@@ -294,9 +294,9 @@ if calculo == "Ajuste del aporte de sodio":
                 
                 
 # ------------------------------
-# 4) Ajuste del aporte de potasio
+# 4) Necesidades de potasio
 # ------------------------------
-if calculo == "Ajuste del aporte de potasio":
+if calculo == "Necesidades de potasio":
     st.sidebar.subheader("Requerimiento ajustado de potasio")
 
     diuresis_ml = st.sidebar.number_input(
