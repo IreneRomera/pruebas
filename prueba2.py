@@ -62,8 +62,8 @@ genero_opcion = st.sidebar.radio(
 )
 genero = genero_opcion[0]  # 'H' o 'M'
 
-pesokg = st.sidebar.number_input("Peso (kg)", min_value=0.0, max_value=250.0, step=0.1)
-tallacm = st.sidebar.number_input("Talla (cm)", min_value=0.0, max_value=250.0, step=0.1)
+pesokg = st.sidebar.number_input("Peso (kg)", min_value=0.0, max_value=250.0, value=50.0, step=0.1)
+tallacm = st.sidebar.number_input("Talla (cm)", min_value=0.0, max_value=250.0, value=150.0, step=0.1)
 
 # Creamos el objeto paciente
 ID = f"PAC-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
