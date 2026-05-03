@@ -363,6 +363,19 @@ if calculo == "Reposición de sodio":
         ]
     )
 
+    # NUEVO: ¿Deseas añadir ampollas de NaCl?
+    ampollas_opcion = st.sidebar.selectbox(
+        "¿Deseas añadir ampollas de Cloruro Sódico (NaCl)?",
+        ["De momento no", "Sí"]
+    )
+
+    num_ampollas = 0
+    if ampollas_opcion == "Sí":
+        num_ampollas = st.sidebar.number_input(
+            "Número de ampollas de NaCl (34 mEq cada una)",
+            min_value=0, max_value=20, value=2, step=1
+        )
+
     boton_hipo = st.sidebar.button("Calcular reposición de sodio")
 
     if boton_hipo:
@@ -377,11 +390,22 @@ if calculo == "Reposición de sodio":
                     act = 2.447 - (0.09516 * edad) + (0.1074 * tallacm) + (0.3362 * pesokg)
                 else:  # genero == "M"
                     act = -2.097 + (0.1069 * tallacm) + (0.2466 * pesokg)
-                    
-                    
+
             # --- 2. Déficit de sodio total (mEq) ---
             delta_na = natremia_objetivo - natremia_actual  # mEq/L
-            deficit_na = act * delta_na                     # mEq totales
+            deficit_na_teorico = act * delta_na             # mEq totales (teórico)
+
+            # Aporte de las ampollas (cada una 34 mEq)
+            aporte_ampollas = num_ampollas * 34.0
+
+            # Déficit "neto" a corregir con el suero seleccionado
+            deficit_na = deficit_na_teorico - aporte_ampollas
+            if deficit_na < 0:
+                deficit_na = 0
+                st.warning(
+                    "El aporte de sodio de las ampollas supera el déficit teórico calculado. "
+                    "No se estima déficit adicional que cubrir con el suero."
+                )
 
             # --- 3. Ritmo de corrección previsto ---
             ritmo_na_dia = (delta_na / tiempo_horas) * 24.0  # mEq/L/día
@@ -399,23 +423,25 @@ if calculo == "Reposición de sodio":
                 conc_na = 154.0
 
             # --- 5. Volumen/velocidad aproximada ---
-            # Déficit a repartir en 'tiempo_horas'
-            # mEq/h que queremos aportar:
+            # mEq/h que queremos aportar con el suero (tras tener en cuenta las ampollas)
             mEq_por_hora = deficit_na / tiempo_horas
 
             # Volumen de solución necesario por hora (mL/h):
             # mEq/h / (mEq/L) = L/h  -> *1000 = mL/h
-            vel_ml_h = (mEq_por_hora / conc_na) * 1000.0
+            vel_ml_h = (mEq_por_hora / conc_na) * 1000.0 if conc_na > 0 else 0
 
             st.subheader("Reposición de sodio")
             st.write(f"Peso del paciente: **{pesokg} kg**")
             st.write(f"ACT estimada: **{act:.1f} L**")
             st.markdown("---")
-            st.write(f"Natremia actual: **{natremia_actual:.1f} mEq/L**")
-            st.write(f"Natremia objetivo: **{natremia_objetivo:.1f} mEq/L**")
-            st.write(f"Diferencia a corregir: **{delta_na:.1f} mEq/L**")
-            st.markdown("---")
-            st.write(f"Déficit total de sodio estimado: **{deficit_na:.1f} mEq**")
+            st.write(f"Déficit total de sodio estimado: **{deficit_na_teorico:.1f} mEq**")
+
+            if num_ampollas > 0:
+                st.write(f"Aporte de sodio por ampollas: **{aporte_ampollas:.1f} mEq** "
+                         f"({num_ampollas} ampollas × 34 mEq)")
+            else:
+                st.write("No se han añadido ampollas de NaCl.")
+
             st.write(f"Tiempo de corrección: **{tiempo_horas:.0f} h**")
             st.write(f"Ritmo aproximado de corrección: **{ritmo_na_dia:.1f} mEq/L/día**")
             if ritmo_na_dia > 12:
@@ -427,13 +453,12 @@ if calculo == "Reposición de sodio":
 
             st.markdown("---")
             st.write(f"Solución elegida: **{solucion_na}** (≈{conc_na} mEq/L de Na+)")
-            st.write(f"Velocidad aproximada de reposición: **{vel_ml_h:.1f} mL/h**")
+            st.write(f"Velocidad aproximada de reposición con el suero: **{vel_ml_h:.1f} mL/h**")
 
             st.caption(
                 "Nota: cálculo orientativo. Ajustar siempre según natremias seriadas, "
                 "situación clínica y recomendaciones de tu protocolo local."
             )
-
 # ------------------------------
 # 6) Reposición de potasio
 # ------------------------------
