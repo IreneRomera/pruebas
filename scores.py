@@ -71,7 +71,7 @@ def calcular_cfs_por_preguntas(c1, c2, c3, c4):
 
     # c4
     if c4 == 1:
-        contador += 1
+        contador += 0
     elif c4 == 2:
         contador += 2
     elif c4 == 3:
@@ -82,7 +82,9 @@ def calcular_cfs_por_preguntas(c1, c2, c3, c4):
         contador += 5
 
     # Traducción a categoría CFS
-    if contador == 1:
+    if contador == 0:
+        return 0, "CFS 1. Paciente en óptimo estado de salud."
+    elif contador == 1:
         return 1, "CFS 1. Paciente en óptimo estado de salud."
     elif contador in (2, 3):
         return 2, "CFS 2. Paciente con buen estado de salud."
