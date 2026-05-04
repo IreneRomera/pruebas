@@ -604,7 +604,7 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
             "Necesita ayuda con todas las actividades fuera de casa, hogar y/o baño",
             "Necesita ayuda para AIVD (finanzas, transporte, hogar, comida, medicación)",
             "No es dependiente pero los síntomas limitan su vida diaria",
-            "Problemas de salud bien controlados y ejercicio más allá de caminar",
+            "Problemas de salud bien controlados pero no realiza ejercicio físico más allá de caminar",
             "Sin síntomas activos y realiza ejercicio ocasional",
             "Realiza ejercicio regular y está más ágil/'fit' de lo esperado para su edad",
         ],
@@ -618,7 +618,7 @@ if score_elegido == "Clinical Frailty Scale (CFS) flowchart":
         "Necesita ayuda con todas las actividades fuera de casa, hogar y/o baño": "f4",
         "Necesita ayuda para AIVD (finanzas, transporte, hogar, comida, medicación)": "f5",
         "No es dependiente pero los síntomas limitan su vida diaria": "f6",
-        "Problemas de salud bien controlados y ejercicio más allá de caminar": "f7",
+        "Problemas de salud bien controlados pero no realiza ejercicio físico más allá de caminar": "f7",
         "Sin síntomas activos y realiza ejercicio ocasional": "f8",
         "Realiza ejercicio regular y está más ágil/'fit' de lo esperado para su edad": "f9",
     }
