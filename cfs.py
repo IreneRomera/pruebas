@@ -20,7 +20,7 @@ st.subheader("⬅ Usa la barra lateral para introducir datos y elegir el cálcul
 # Imagen centrada CFS
 # ======================
 # Carga la imagen (pon el fichero en la misma carpeta que tu script)
-imagen_cfs = Image.open("CFSespana.jpeg")
+imagen_cfs = Image.open("CFS-espana.jpeg")
 
 # Creamos tres columnas y usamos la del centro
 col1, col2, col3 = st.columns([1, 2, 1])
