@@ -13,7 +13,8 @@ from PIL import Image
 
 st.set_page_config(page_title="Calculadora de escala de fragilidad")
 
-st.title("Calculadora del Clinical Frailty Scale (CFS) como escala de fragilidad validad en adultos de edad igual o superior a 65 años.")
+st.title("Calculadora del Clinical Frailty Scale (CFS)")
+st.subheader("Escala de fragilidad validada en adultos de edad igual o superior a 65 años.")
 st.subheader("⬅ Usa la barra lateral para introducir datos y elegir el cálculo")
 
 # ======================
