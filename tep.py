@@ -10,8 +10,10 @@ import streamlit as st
 from datetime import datetime
 from streamlit_extras.buy_me_a_coffee import button
 
-st.set_page_config(page_title="Calculadoras para el manejo integral del tromboembolismo pulmonar (TEP)")
-
+st.set_page_config(
+    page_title="Calculadoras para el manejo integral del tromboembolismo pulmonar (TEP)",
+    layout="wide"
+)
 st.subheader("⬅ Usa la barra lateral para introducir datos y elegir el cálculo")
 
 # ------------------------------
