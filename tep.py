@@ -14,9 +14,14 @@ st.set_page_config(
     page_title="Calculadoras para el manejo integral del tromboembolismo pulmonar (TEP)",
     layout="wide"
 )
+
+if "categoria" not in st.session_state:
+    st.session_state.categoria = None
+
 st.title("Calculadoras para el manejo integral del tromboembolismo pulmonar (TEP)")
 
-st.subheader("⬅ Usa la barra lateral para introducir datos y elegir el cálculo")
+st.subheader("⬅ Usa la barra lateral para elegir el cálculo")
+
 
 # ------------------------------
 # Funciones de cálculo de escalas
@@ -132,8 +137,15 @@ def render_wells():
         )
         
         
+        
+        
+        
+        
+        
+        
+
 # ------------------------------
-# Barra lateral: elegir cálculo
+# Barra lateral: botones de categoría
 # ------------------------------
 
 st.sidebar.markdown(
@@ -145,21 +157,21 @@ st.sidebar.markdown(
     unsafe_allow_html=True,
 )
 
-calculo = st.sidebar.selectbox(
-    "Categoría",
-    [
-        "Escalas de probabilidad clínica (diagnóstico y toma de decisiones)",
-        "Escalas de riesgo y pronóstico",
-        "Tratamiento",
-    ],
-    index=None,
-    placeholder="Elige una categoría"
-)
+if st.sidebar.button("Escalas de probabilidad clínica", use_container_width=True):
+    st.session_state.categoria = "probabilidad"
+
+if st.sidebar.button("Escalas de riesgo y pronóstico", use_container_width=True):
+    st.session_state.categoria = "riesgo"
+
+if st.sidebar.button("Tratamiento", use_container_width=True):
+    st.session_state.categoria = "tratamiento"
+
 
 # ------------------------------
-# Escalas de probabilidad clínica
+# Contenido principal según categoría
 # ------------------------------
-if calculo == "Escalas de probabilidad clínica (diagnóstico y toma de decisiones)":
+
+if st.session_state.categoria == "probabilidad":
     subcategoria = st.sidebar.selectbox(
         "Selecciona una escala",
         [
@@ -175,7 +187,7 @@ if calculo == "Escalas de probabilidad clínica (diagnóstico y toma de decision
     elif subcategoria == "Escala YEARS + Dímero-D":
         render_years()
     else:
-        st.info("Selecciona una escala en la barra lateral para comenzar.")
+        st.info("Selecciona una escala de probabilidad clínica en la barra lateral.")
 
 
 
