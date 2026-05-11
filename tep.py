@@ -179,7 +179,7 @@ def render_years():
             ddimero = st.number_input(
                 "Dímero-D (ng/mL, FEU)",
                 min_value=0.0,
-                value=500,
+                value=None,
                 placeholder="Introduce el valor del Dímero-D",
                 step=10.0,
                 format="%.0f",
