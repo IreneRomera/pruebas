@@ -14,6 +14,8 @@ st.set_page_config(
     page_title="Calculadoras para el manejo integral del tromboembolismo pulmonar (TEP)",
     layout="wide"
 )
+st.title("Calculadoras para el manejo integral del tromboembolismo pulmonar (TEP)")
+
 st.subheader("⬅ Usa la barra lateral para introducir datos y elegir el cálculo")
 
 # ------------------------------
@@ -144,12 +146,14 @@ st.sidebar.markdown(
 )
 
 calculo = st.sidebar.selectbox(
-    "",
+    "Categoría",
     [
         "Escalas de probabilidad clínica (diagnóstico y toma de decisiones)",
         "Escalas de riesgo y pronóstico",
         "Tratamiento",
     ],
+    index=None,
+    placeholder="Elige una categoría"
 )
 
 # ------------------------------
@@ -162,12 +166,16 @@ if calculo == "Escalas de probabilidad clínica (diagnóstico y toma de decision
             "Escala de Wells",
             "Escala YEARS + Dímero-D",
         ],
+        index=None,
+        placeholder="Elige una escala"
     )
 
     if subcategoria == "Escala de Wells":
         render_wells()
     elif subcategoria == "Escala YEARS + Dímero-D":
         render_years()
+    else:
+        st.info("Selecciona una escala en la barra lateral para comenzar.")
 
 
 
