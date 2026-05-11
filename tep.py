@@ -28,19 +28,20 @@ st.subheader("⬅ Usa la barra lateral para elegir el cálculo")
 # ------------------------------
 
 def interpretar_wells(puntuacion):
-    if puntuacion <= 4:
-        return "TEP improbable", "Considerar Dímero-D para ayudar a descartar TEP según el contexto clínico."
+    if puntuacion <= 2:
+        return "TEP improbable", "Se aconseja revalorar el contexto clínico."
+    elif 3 <= puntuacion <= 6:
+        return "TEP poco probable", "Considerar escala Years y dímero-D para ayudar a descartar TEP según el contexto clínico."
     else:
-        return "TEP probable", "Considerar diagnóstico por imagen según el contexto clínico."
-
+        return "TEP muy probable", "Considerar diagnóstico por imagen."
 
 def render_wells():
     st.header("Escala de Wells para TEP")
     st.caption("Estimación de probabilidad clínica pretest en pacientes con sospecha de tromboembolismo pulmonar.")
 
     st.info(
-        "Versión mostrada: modelo dicotómico de Wells para TEP. "
-        "Interpretación: 4 puntos o menos = TEP improbable; más de 4 puntos = TEP probable.",
+        "Versión mostrada: modelo de tres niveles de riesgo para TEP. "
+        "Interpretación: 2 puntos o menos = TEP improbable; entre 3 y 6 puntos = TEP poco probable; más de 6 puntos = TEP muy probable.",
         icon="🩺"
     )
 
@@ -123,7 +124,9 @@ def render_wells():
             st.metric("Puntuación total", puntuacion)
 
         with r2:
-            if puntuacion <= 4:
+            if puntuacion <= 2:
+                st.success(f"**{categoria}**. {recomendacion}", icon="🟢")
+            elif 3 <= puntuacion <= 6:
                 st.warning(f"**{categoria}**. {recomendacion}", icon="🟡")
             else:
                 st.error(f"**{categoria}**. {recomendacion}", icon="🔴")
@@ -138,8 +141,124 @@ def render_wells():
         
         
         
-        
-        
+def interpretar_years(contyears, ddimero):
+    if contyears >= 1:
+        punto_corte = 500
+        if ddimero < punto_corte:
+            decision = "Se descarta el tromboembolismo pulmonar."
+            estado = "descartado"
+        else:
+            decision = "Se recomienda realizar angio-TC."
+            estado = "angio_tc"
+    else:
+        punto_corte = 1000
+        if ddimero < punto_corte:
+            decision = "Se descarta el tromboembolismo pulmonar."
+            estado = "descartado"
+        else:
+            decision = "Se recomienda realizar angio-TC."
+            estado = "angio_tc"
+
+    return punto_corte, decision, estado
+
+
+def render_years():
+    st.header("Escala YEARS + Dímero-D")
+    st.caption("Algoritmo diagnóstico simplificado para sospecha de TEP con punto de corte variable de Dímero-D.")
+
+    st.info(
+        "Regla YEARS: si no hay criterios YEARS, puede usarse un punto de corte de Dímero-D de 1000 ng/mL FEU; "
+        "si existe 1 o más criterios YEARS, el punto de corte es 500 ng/mL FEU.",
+        icon="🩺"
+    )
+
+    with st.container(border=True):
+        st.markdown("### Datos clínicos")
+
+        with st.form("form_years"):
+            ddimero = st.number_input(
+                "Dímero-D (ng/mL, FEU)",
+                min_value=0.0,
+                value=None,
+                placeholder="Introduce el valor del Dímero-D",
+                step=50.0,
+                format="%.0f",
+                help="Si tu laboratorio informa en DDU, recuerda que aproximadamente DDU = FEU / 2."
+            )
+
+            c1, c2, c3 = st.columns(3, gap="large")
+
+            with c1:
+                years1 = st.radio(
+                    "Signos o síntomas de TVP",
+                    ["No", "Sí"],
+                    horizontal=True
+                )
+
+            with c2:
+                years2 = st.radio(
+                    "El TEP es la principal sospecha diagnóstica",
+                    ["No", "Sí"],
+                    horizontal=True
+                )
+
+            with c3:
+                years3 = st.radio(
+                    "Hemoptisis",
+                    ["No", "Sí"],
+                    horizontal=True
+                )
+
+            submitted = st.form_submit_button("Calcular YEARS + Dímero-D", use_container_width=True)
+
+    if submitted:
+        if ddimero is None:
+            st.error("Introduce un valor de Dímero-D para poder calcular el resultado.", icon="⚠️")
+            return
+
+        desglose = {
+            "Signos o síntomas de TVP": 1 if years1 == "Sí" else 0,
+            "TEP como principal sospecha diagnóstica": 1 if years2 == "Sí" else 0,
+            "Hemoptisis": 1 if years3 == "Sí" else 0,
+        }
+
+        contyears = sum(desglose.values())
+        punto_corte, decision, estado = interpretar_years(contyears, ddimero)
+
+        st.markdown("### Resultado")
+
+        r1, r2, r3 = st.columns(3, gap="large")
+
+        with r1:
+            st.metric("Criterios YEARS", contyears)
+
+        with r2:
+            st.metric("Dímero-D", f"{ddimero:.0f} ng/mL")
+
+        with r3:
+            st.metric("Punto de corte aplicado", f"{punto_corte} ng/mL")
+
+        if estado == "descartado":
+            st.success(f"**Resultado:** {decision}", icon="✅")
+        else:
+            st.warning(f"**Resultado:** {decision}", icon="📌")
+
+        if contyears == 0:
+            st.caption(
+                "No hay criterios YEARS positivos, por lo que se aplica un umbral de Dímero-D de 1000 ng/mL FEU."
+            )
+        else:
+            st.caption(
+                "Hay 1 o más criterios YEARS positivos, por lo que se aplica un umbral de Dímero-D de 500 ng/mL FEU."
+            )
+
+        with st.expander("Ver desglose de criterios YEARS"):
+            for criterio, valor in desglose.items():
+                st.write(f"- {criterio}: **{valor}**")
+
+        st.caption(
+            "Esta calculadora es una ayuda a la toma de decisiones y debe interpretarse junto con el contexto clínico completo."
+        )     
         
         
         
