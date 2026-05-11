@@ -141,14 +141,16 @@ st.sidebar.markdown(
     unsafe_allow_html=True,
 )
 
-score_elegido = st.sidebar.selectbox(
-    "",
-    [
-        "Clinical Frailty Scale (CFS) basado en preguntas",
-        "Clinical Frailty Scale (CFS) flowchart",
-    ],
-)
+if "score_elegido" not in st.session_state:
+    st.session_state.score_elegido = "Clinical Frailty Scale (CFS) basado en preguntas"
 
+if st.sidebar.button("Clinical Frailty Scale (CFS) basado en preguntas", use_container_width=True):
+    st.session_state.score_elegido = "Clinical Frailty Scale (CFS) basado en preguntas"
+
+if st.sidebar.button("Clinical Frailty Scale (CFS) flowchart", use_container_width=True):
+    st.session_state.score_elegido = "Clinical Frailty Scale (CFS) flowchart"
+
+score_elegido = st.session_state.score_elegido
 
 # ------------------------------
 # Clinical Frailty Scale (CFS)
