@@ -624,7 +624,7 @@ def render_hbpm():
                     "Peso (kg)",
                     min_value=30.0,
                     max_value=200.0,
-                    value=60,
+                    value=None,
                     placeholder="Introduce el peso del paciente",
                     step=0.1,
                     format="%.1f"
