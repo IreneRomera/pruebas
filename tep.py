@@ -719,7 +719,215 @@ def render_hbpm():
             "Verifica siempre la indicación, la función renal y la ficha técnica/local antes de prescribir."
         )
 
+def render_hna():
+    st.header("Anticoagulación con perfusión de heparina sódica")
+    st.caption("Cálculo del bolo inicial, velocidad de perfusión y ajuste según TTPA.")
 
+    st.warning(
+        "Herramienta orientativa. Verifica siempre protocolo local, indicación clínica, riesgo hemorrágico, plaquetas y controles analíticos.",
+        icon="💊"
+    )
+
+    # ------------------------------
+    # 1) DOSIS INICIAL
+    # ------------------------------
+    st.markdown("### Inicio de perfusión")
+
+    with st.container(border=True):
+        with st.form("form_hepsod_inicio"):
+            c1, c2 = st.columns(2, gap="large")
+
+            with c1:
+                peso = st.number_input(
+                    "Peso (kg)",
+                    min_value=1.0,
+                    max_value=300.0,
+                    value=None,
+                    placeholder="Introduce el peso del paciente",
+                    step=0.1,
+                    format="%.1f"
+                )
+
+            with c2:
+                diluheparina = st.number_input(
+                    "Dilución de heparina sódica (UI/mL)",
+                    min_value=1.0,
+                    max_value=50000.0,
+                    value=None,
+                    placeholder="Introduce la dilución",
+                    step=1.0,
+                    format="%.0f"
+                )
+
+            submitted_inicio = st.form_submit_button("Calcular dosis inicial", use_container_width=True)
+
+    if submitted_inicio:
+        if peso is None:
+            st.error("Introduce el peso del paciente.", icon="⚠️")
+            return
+
+        if diluheparina is None or diluheparina <= 0:
+            st.error("Introduce una dilución válida.", icon="⚠️")
+            return
+
+        bolohepsod = round(80 * peso, 0)
+        perfuhepsod = round(18 * peso, 1)  # UI/h
+        velhepsod = round(perfuhepsod / diluheparina, 2)  # mL/h
+
+        c1, c2, c3 = st.columns(3, gap="large")
+
+        with c1:
+            st.metric("Bolo inicial", f"{bolohepsod:.0f} UI")
+
+        with c2:
+            st.metric("Perfusión inicial", f"{perfuhepsod:.1f} UI/h")
+
+        with c3:
+            st.metric("Velocidad inicial", f"{velhepsod:.2f} mL/h")
+
+        st.success(
+            f"Administrar un bolo inicial de **{bolohepsod:.0f} UI** y después iniciar perfusión continua a **{velhepsod:.2f} mL/h** "
+            f"(equivalente a **{perfuhepsod:.1f} UI/h**) con la dilución indicada.",
+            icon="💉"
+        )
+
+    # ------------------------------
+    # 2) AJUSTE SEGÚN TTPA
+    # ------------------------------
+    st.markdown("### Ajuste de perfusión según TTPA")
+
+    with st.container(border=True):
+        with st.form("form_hepsod_ajuste"):
+            c1, c2, c3 = st.columns(3, gap="large")
+
+            with c1:
+                peso_aj = st.number_input(
+                    "Peso para ajuste (kg)",
+                    min_value=1.0,
+                    max_value=300.0,
+                    value=None,
+                    placeholder="Peso del paciente",
+                    step=0.1,
+                    format="%.1f",
+                    key="peso_aj_hep"
+                )
+
+            with c2:
+                velocidad_actual = st.number_input(
+                    "Velocidad actual de perfusión (mL/h)",
+                    min_value=0.0,
+                    max_value=500.0,
+                    value=None,
+                    placeholder="Velocidad actual",
+                    step=0.1,
+                    format="%.2f"
+                )
+
+            with c3:
+                dilucion_aj = st.number_input(
+                    "Dilución de heparina sódica (UI/mL)",
+                    min_value=1.0,
+                    max_value=50000.0,
+                    value=None,
+                    placeholder="Dilución",
+                    step=1.0,
+                    format="%.0f",
+                    key="dilucion_aj_hep"
+                )
+
+            ttpa = st.number_input(
+                "TTPA (segundos)",
+                min_value=0.0,
+                max_value=300.0,
+                value=None,
+                placeholder="Introduce el TTPA",
+                step=1.0,
+                format="%.0f"
+            )
+
+            submitted_ajuste = st.form_submit_button("Ajustar perfusión", use_container_width=True)
+
+    if submitted_ajuste:
+        if peso_aj is None:
+            st.error("Introduce el peso del paciente para el ajuste.", icon="⚠️")
+            return
+
+        if velocidad_actual is None:
+            st.error("Introduce la velocidad actual de la perfusión.", icon="⚠️")
+            return
+
+        if dilucion_aj is None or dilucion_aj <= 0:
+            st.error("Introduce una dilución válida.", icon="⚠️")
+            return
+
+        if ttpa is None:
+            st.error("Introduce el valor del TTPA.", icon="⚠️")
+            return
+
+        tasa_actual_ui_h = velocidad_actual * dilucion_aj
+        tasa_actual_ui_kg_h = tasa_actual_ui_h / peso_aj
+
+        bolo = None
+        pausa = None
+        cambio_ui_kg_h = 0
+        mensaje = ""
+
+        if ttpa < 35:
+            bolo = 80 * peso_aj
+            cambio_ui_kg_h = 4
+            mensaje = "TTPA por debajo de rango."
+        elif 35 <= ttpa <= 45:
+            bolo = 40 * peso_aj
+            cambio_ui_kg_h = 2
+            mensaje = "TTPA ligeramente por debajo de rango."
+        elif 46 <= ttpa <= 70:
+            cambio_ui_kg_h = 0
+            mensaje = "TTPA en rango terapéutico. Mantener la misma velocidad."
+        elif 71 <= ttpa <= 90:
+            cambio_ui_kg_h = -2
+            mensaje = "TTPA por encima de rango."
+        else:
+            pausa = 1
+            cambio_ui_kg_h = -3
+            mensaje = "TTPA marcadamente elevado."
+
+        nueva_tasa_ui_kg_h = tasa_actual_ui_kg_h + cambio_ui_kg_h
+        nueva_tasa_ui_h = nueva_tasa_ui_kg_h * peso_aj
+        nueva_velocidad_ml_h = nueva_tasa_ui_h / dilucion_aj
+
+        st.markdown("#### Recomendación")
+
+        if bolo is not None:
+            st.info(f"Administrar bolo de **{bolo:.0f} UI**.", icon="💉")
+
+        if pausa is not None:
+            st.warning("Suspender la perfusión durante **1 hora**.", icon="⏸️")
+
+        if nueva_velocidad_ml_h < 0:
+            st.error("El ajuste calculado genera una velocidad negativa. Revisa los datos introducidos y el protocolo local.", icon="⚠️")
+            return
+
+        c1, c2, c3 = st.columns(3, gap="large")
+
+        with c1:
+            st.metric("Velocidad actual", f"{velocidad_actual:.2f} mL/h")
+
+        with c2:
+            st.metric("Nueva velocidad", f"{nueva_velocidad_ml_h:.2f} mL/h")
+
+        with c3:
+            st.metric("Equivalente", f"{nueva_tasa_ui_h:.1f} UI/h")
+
+        if 46 <= ttpa <= 70:
+            st.success(mensaje, icon="🟢")
+        elif ttpa < 46 or 71 <= ttpa <= 90:
+            st.warning(mensaje, icon="🟡")
+        else:
+            st.error(mensaje, icon="🔴")
+
+        st.caption(
+            "Repetir control de TTPA aproximadamente a las 6 horas tras el inicio o tras cualquier ajuste de dosis."
+        )
 
 
 
