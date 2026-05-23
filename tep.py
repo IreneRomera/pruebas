@@ -604,6 +604,122 @@ def render_bova():
         )
 
 
+def render_hbpm():
+    st.header("Anticoagulación con heparina de bajo peso molecular")
+    st.caption("Cálculo orientativo de dosis terapéutica según peso y fármaco seleccionado.")
+
+    st.warning(
+        "Herramienta orientativa. Antes de prescribir, revisa función renal, riesgo hemorrágico, peso extremo, embarazo, trombocitopenia y protocolos locales.",
+        icon="💊"
+    )
+
+    with st.container(border=True):
+        st.markdown("### Datos del paciente")
+
+        with st.form("form_hbpm"):
+            c1, c2 = st.columns(2, gap="large")
+
+            with c1:
+                peso = st.number_input(
+                    "Peso (kg)",
+                    min_value=1.0,
+                    max_value=300.0,
+                    value=None,
+                    placeholder="Introduce el peso del paciente",
+                    step=0.1,
+                    format="%.1f"
+                )
+
+            with c2:
+                hbpm = st.selectbox(
+                    "Fármaco",
+                    [
+                        "Enoxaparina",
+                        "Bemiparina",
+                        "Tinzaparina",
+                        "Dalteparina",
+                        "Fondaparinux"
+                    ],
+                    index=None,
+                    placeholder="Selecciona un fármaco"
+                )
+
+            submitted = st.form_submit_button("Calcular dosis", use_container_width=True)
+
+    if submitted:
+        if peso is None:
+            st.error("Introduce el peso del paciente.", icon="⚠️")
+            return
+
+        if hbpm is None:
+            st.error("Selecciona un fármaco.", icon="⚠️")
+            return
+
+        st.markdown("### Resultado")
+
+        if hbpm == "Enoxaparina":
+            enoxatto1 = round(peso, 1)
+            enoxatto2 = round(1.5 * peso, 1)
+
+            st.success(
+                f"**Enoxaparina:** {enoxatto1} mg SC cada 12 h "
+                f"o {enoxatto2} mg SC cada 24 h.",
+                icon="💉"
+            )
+
+        elif hbpm == "Bemiparina":
+            bemipatto1 = round(115 * peso, 0)
+            bemipatto2 = round(85 * peso, 0)
+
+            st.success(
+                f"**Bemiparina:** {bemipatto1:.0f} UI SC cada 24 h.",
+                icon="💉"
+            )
+
+            st.info(
+                f"Si existe insuficiencia renal severa o se requieren dosis intermedias: {bemipatto2:.0f} UI SC cada 24 h."
+            )
+
+        elif hbpm == "Tinzaparina":
+            tinzap = round(175 * peso, 0)
+
+            st.success(
+                f"**Tinzaparina:** {tinzap:.0f} UI SC cada 24 h.",
+                icon="💉"
+            )
+
+        elif hbpm == "Dalteparina":
+            daltep1 = round(100 * peso, 0)
+            daltep2 = round(200 * peso, 0)
+
+            st.success(
+                f"**Dalteparina:** {daltep1:.0f} UI SC cada 12 h "
+                f"o {daltep2:.0f} UI SC cada 24 h.",
+                icon="💉"
+            )
+
+        elif hbpm == "Fondaparinux":
+            if peso < 50:
+                dosis = 5
+            elif 50 <= peso <= 100:
+                dosis = 7.5
+            else:
+                dosis = 10
+
+            st.success(
+                f"**Fondaparinux:** {dosis} mg SC cada 24 h.",
+                icon="💉"
+            )
+
+        with st.expander("Ver datos introducidos"):
+            st.write(f"- Peso: **{peso:.1f} kg**")
+            st.write(f"- Fármaco seleccionado: **{hbpm}**")
+
+        st.caption(
+            "Verifica siempre la indicación, la función renal y la ficha técnica/local antes de prescribir."
+        )
+
+
 
 
 
@@ -679,112 +795,27 @@ elif st.session_state.categoria == "riesgo":
         st.info("Selecciona una escala de pronóstico y riesgo en la barra lateral.")
 
 
-def interpretar_bova(puntuacion):
-    if puntuacion <= 2:
-        return (
-            "Estadio I",
-            "Riesgo bajo",
-            "4,4% de riesgo de complicaciones relacionadas con TEP y 3,1% de mortalidad a 30 días."
-        )
-    elif 3 <= puntuacion <= 4:
-        return (
-            "Estadio II",
-            "Riesgo intermedio",
-            "18% de riesgo de complicaciones relacionadas con TEP y 6,8% de mortalidad a 30 días."
-        )
-    else:
-        return (
-            "Estadio III",
-            "Riesgo alto",
-            "42% de riesgo de complicaciones relacionadas con TEP y 10,5% de mortalidad a 30 días."
-        )
-
-
-def render_bova():
-    st.header("BOVA score")
-    st.caption("Estratificación pronóstica en pacientes normotensos con TEP agudo.")
-
-    st.info(
-        "El BOVA score se aplica en pacientes con TEP agudo hemodinámicamente estables o normotensos y estima el riesgo de complicaciones a 30 días.",
-        icon="🩺"
+elif st.session_state.categoria == "tratamiento":
+    subcategoria = st.sidebar.selectbox(
+        "Selecciona una opción terapéutica",
+        [
+            "Anticoagulación con heparina de bajo peso molecular",
+            "Anticoagulación con perfusión de heparina sódica",
+            "Indicación de trombectomía mecánica"
+        ],
+        index=None,
+        placeholder="Elige una opción",
+        key="subcategoria_tratamiento"
     )
 
-    with st.container(border=True):
-        st.markdown("### Datos clínicos")
-
-        with st.form("form_bova"):
-            c1, c2 = st.columns(2, gap="large")
-
-            with c1:
-                bova1 = st.radio(
-                    "Presión arterial sistólica entre 90 y 100 mmHg",
-                    ["No", "Sí"],
-                    horizontal=True
-                )
-
-                bova2 = st.radio(
-                    "Elevación de troponinas",
-                    ["No", "Sí"],
-                    horizontal=True
-                )
-
-            with c2:
-                bova3 = st.radio(
-                    "Disfunción del ventrículo derecho",
-                    ["No", "Sí"],
-                    help="Basada en ecocardiografía o pruebas de imagen según disponibilidad.",
-                    horizontal=True
-                )
-
-                bova4 = st.radio(
-                    "Frecuencia cardiaca ≥ 110 lpm",
-                    ["No", "Sí"],
-                    horizontal=True
-                )
-
-            submitted = st.form_submit_button("Calcular BOVA", use_container_width=True)
-
-    if submitted:
-        desglose = {
-            "PAs 90–100 mmHg": 2 if bova1 == "Sí" else 0,
-            "Troponinas elevadas": 2 if bova2 == "Sí" else 0,
-            "Disfunción del ventrículo derecho": 2 if bova3 == "Sí" else 0,
-            "FC ≥ 110 lpm": 1 if bova4 == "Sí" else 0,
-        }
-
-        puntuacion = sum(desglose.values())
-        estadio, riesgo, recomendacion = interpretar_bova(puntuacion)
-
-        st.markdown("### Resultado")
-
-        r1, r2, r3 = st.columns(3, gap="large")
-
-        with r1:
-            st.metric("Puntuación total", puntuacion)
-
-        with r2:
-            st.metric("Estadio BOVA", estadio)
-
-        with r3:
-            st.metric("Estrato", riesgo)
-
-        if puntuacion <= 2:
-            st.success(f"**{estadio}**. {riesgo}. {recomendacion}", icon="🟢")
-        elif 3 <= puntuacion <= 4:
-            st.warning(f"**{estadio}**. {riesgo}. {recomendacion}", icon="🟡")
-        else:
-            st.error(f"**{estadio}**. {riesgo}. {recomendacion}", icon="🔴")
-
-        with st.expander("Ver desglose de la puntuación"):
-            for criterio, valor in desglose.items():
-                st.write(f"- {criterio}: **{valor}** punto(s)")
-
-        st.caption(
-            "El BOVA score complementa la estratificación pronóstica y debe interpretarse junto con biomarcadores, imagen, estabilidad hemodinámica y juicio clínico."
-        )
-
-
-
+    if subcategoria == "Anticoagulación con heparina de bajo peso molecular":
+        render_hbpm()
+    elif subcategoria == "Anticoagulación con perfusión de heparina sódica":
+        render_hna()
+    elif subcategoria == "Indicación de trombectomía mecánica":
+        render_trombect()
+    else:
+        st.info("Selecciona una opción terapéutica en la barra lateral.")
 
 
 
