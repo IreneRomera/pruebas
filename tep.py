@@ -622,9 +622,9 @@ def render_hbpm():
             with c1:
                 peso = st.number_input(
                     "Peso (kg)",
-                    min_value=1.0,
-                    max_value=300.0,
-                    value=None,
+                    min_value=30.0,
+                    max_value=200.0,
+                    value=60,
                     placeholder="Introduce el peso del paciente",
                     step=0.1,
                     format="%.1f"
