@@ -719,6 +719,7 @@ def render_hbpm():
             "Verifica siempre la indicación, la función renal y la ficha técnica/local antes de prescribir."
         )
 
+
 def render_hna():
     st.header("Anticoagulación con perfusión de heparina sódica")
     st.caption("Cálculo del bolo inicial, velocidad de perfusión y ajuste según TTPA.")
@@ -928,6 +929,112 @@ def render_hna():
         st.caption(
             "Repetir control de TTPA aproximadamente a las 6 horas tras el inicio o tras cualquier ajuste de dosis."
         )
+        
+def render_alteplasa():
+    st.header("Fibrinólisis con alteplasa")
+    st.caption("Resumen práctico de pautas sistémicas de alteplasa en tromboembolismo pulmonar.")
+
+    st.error(
+        "Usar solo en el contexto clínico adecuado y tras valorar contraindicaciones hemorrágicas, situación hemodinámica y protocolo local.",
+        icon="🩸"
+    )
+
+    st.markdown("### Contraindicaciones para trombolíticos")
+
+    c1, c2 = st.columns(2, gap="large")
+
+    with c1:
+        st.error(
+            """
+**Contraindicaciones absolutas**
+- Antecedente de sangrado en SNC
+- ACV isquémico < 3 meses
+- Cirugía del SNC o trauma mayor reciente (< 1 mes)
+- Sangrado activo
+- Tumor del SNC o enfermedad estructural cerebral
+- Disección aórtica
+- Resucitación cardiopulmonar prolongada (> 10 minutos)
+- Diátesis hemorrágica conocida
+- INR/RIN > 1,7
+- Plaquetas < 100.000/mm³
+            """,
+            icon="⛔"
+        )
+
+    with c2:
+        st.warning(
+            """
+**Contraindicaciones relativas**
+- HTA no controlada (> 180 mmHg sistólica)
+- Edad > 75 años
+- Sangrado reciente no intracraneal
+- Embarazo
+- Pericarditis aguda o derrame pericárdico
+- Malformaciones vasculares o retinopatía diabética
+- Uso de HBPM o anticoagulación oral con AVK o AOD
+- Punción vascular no compresible reciente
+- Cirugía reciente (< 2–4 semanas)
+- Úlcera péptica activa
+            """,
+            icon="⚠️"
+        )
+
+    st.markdown("### Pauta estándar")
+
+    c1, c2, c3 = st.columns(3, gap="large")
+
+    with c1:
+        st.metric("Dosis total", "100 mg")
+
+    with c2:
+        st.metric("Bolo inicial", "10 mg")
+
+    with c3:
+        st.metric("Duración total", "2 horas")
+
+    st.success(
+        "**Régimen habitual:** bolo IV inicial de **10 mg en 1–2 minutos**, seguido de **90 mg en perfusión hasta completar 2 horas**.",
+        icon="💉"
+    )
+
+    with st.container(border=True):
+        st.markdown("### Ajuste por bajo peso")
+        st.info(
+            "Si el paciente pesa **menos de 65 kg**, la **dosis total no debe exceder 1,5 mg/kg** para evitar sobredosificación.",
+            icon="⚖️"
+        )
+
+    with st.container(border=True):
+        st.markdown("### Dosis reducida")
+        st.warning(
+            "En escenarios seleccionados se ha utilizado **alteplasa a dosis reducida**, habitualmente **0,6 mg/kg en 15 minutos** con un **máximo de 50 mg**. "
+            "La evidencia es limitada y esta pauta puede estar **fuera de ficha técnica**.",
+            icon="🟡"
+        )
+
+    with st.container(border=True):
+        st.markdown("### Parada cardiorrespiratoria")
+        st.error(
+            "En parada cardiorrespiratoria por TEP masivo puede administrarse **50 mg IV en bolo en 2 minutos**. "
+            "Si no hay recuperación de la circulación espontánea tras **15 minutos**, puede considerarse **un segundo bolo de 50 mg** mientras continúa la RCP.",
+            icon="🚨"
+        )
+
+    with st.container(border=True):
+        st.markdown("### Heparina posterior")
+        st.info(
+            "Tras alteplasa, iniciar o reiniciar **heparina** cuando el **TTPA sea menor de 2 veces el valor control**. "
+            "Después, ajustar la perfusión para mantener un TTPA de aproximadamente **1,5 a 2,5 veces** el valor basal o control, según protocolo local.",
+            icon="📋"
+        )
+
+    with st.expander("Ver recordatorio práctico"):
+        st.write("- Confirmar indicación y ausencia de contraindicaciones mayores al sangrado.")
+        st.write("- Verificar peso si se plantea ajuste por bajo peso o estrategias de dosis reducida.")
+        st.write("- Coordinar monitorización hemodinámica, analítica y plan de anticoagulación posterior.")
+        st.write("- Revisar siempre el protocolo local antes de administrar fibrinólisis sistémica.")
+
+       
 
 
 
@@ -1009,6 +1116,7 @@ elif st.session_state.categoria == "tratamiento":
         [
             "Anticoagulación con heparina de bajo peso molecular",
             "Anticoagulación con perfusión de heparina sódica",
+            "Fibrinolisis con alteplasa",
             "Indicación de trombectomía mecánica"
         ],
         index=None,
@@ -1020,6 +1128,8 @@ elif st.session_state.categoria == "tratamiento":
         render_hbpm()
     elif subcategoria == "Anticoagulación con perfusión de heparina sódica":
         render_hna()
+    elif subcategoria == "Fibrinolisis con alteplasa":
+        render_alteplasa()
     elif subcategoria == "Indicación de trombectomía mecánica":
         render_trombect()
     else:
