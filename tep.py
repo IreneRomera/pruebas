@@ -1138,15 +1138,6 @@ def render_trombect():
             for criterio, valor in menores.items():
                 st.write(f"- {criterio}: **{valor}** punto(s)")      
 
-def interpretar_riete(puntuacion):
-    if puntuacion == 0:
-        return "Riesgo bajo", "La puntuación RIETE es 0."
-    elif 1 <= puntuacion <= 4:
-        return "Riesgo intermedio", "La puntuación RIETE está entre 1 y 4."
-    else:
-        return "Riesgo alto", "La puntuación RIETE es superior a 4."
-
-
 def render_riete():
     st.header("Riesgo de sangrado - Escala RIETE")
     st.caption("Escala RIETE para estimación de riesgo hemorrágico en pacientes con enfermedad tromboembólica venosa.")
@@ -1185,8 +1176,8 @@ def render_riete():
 
                 creatinina = st.number_input(
                     "Creatinina (mg/dL)",
-                    min_value=0.0,
-                    max_value=20.0,
+                    min_value=0.00,
+                    max_value=20.00,
                     value=None,
                     placeholder="Introduce la creatinina",
                     step=0.1,
@@ -1236,7 +1227,7 @@ def render_riete():
 
         st.markdown("### Resultado")
 
-        r1, r2, r3 = st.columns(3, gap="large")
+        r1, r2 = st.columns(2, gap="large")
 
         with r1:
             st.metric("Puntuación total", puntuacion)
@@ -1244,13 +1235,6 @@ def render_riete():
         with r2:
             st.metric("Categoría", categoria)
 
-        with r3:
-            if puntuacion == 0:
-                st.metric("Estrato", "Bajo")
-            elif 1 <= puntuacion <= 4:
-                st.metric("Estrato", "Intermedio")
-            else:
-                st.metric("Estrato", "Alto")
 
         if puntuacion == 0:
             st.success(f"**{categoria}**. {texto}", icon="🟢")
@@ -1266,7 +1250,6 @@ def render_riete():
         st.caption(
             "Según la escala RIETE original: 2 puntos para sangrado reciente, 1,5 para creatinina elevada o anemia, y 1 punto para cáncer y edad > 75 años."
         )
-
 
 
 
