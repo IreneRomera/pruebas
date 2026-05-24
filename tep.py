@@ -1138,6 +1138,139 @@ def render_trombect():
             for criterio, valor in menores.items():
                 st.write(f"- {criterio}: **{valor}** punto(s)")      
 
+def interpretar_riete(puntuacion):
+    if puntuacion == 0:
+        return "Riesgo bajo", "La puntuación RIETE es 0."
+    elif 1 <= puntuacion <= 4:
+        return "Riesgo intermedio", "La puntuación RIETE está entre 1 y 4."
+    else:
+        return "Riesgo alto", "La puntuación RIETE es superior a 4."
+
+
+def render_riete():
+    st.header("Riesgo de sangrado - Escala RIETE")
+    st.caption("Escala RIETE para estimación de riesgo hemorrágico en pacientes con enfermedad tromboembólica venosa.")
+
+    st.info(
+        "Variables incluidas: hemorragia mayor reciente, creatinina > 1,2 mg/dL, anemia, cáncer y edad > 75 años.",
+        icon="🩸"
+    )
+
+    st.markdown("### Tabla de la escala")
+    st.table([
+        {"Variable": "Hemorragia mayor reciente (un mes)", "Puntuación": 2.0},
+        {"Variable": "Creatinina > 1.2 mg/dL", "Puntuación": 1.5},
+        {"Variable": "Anemia", "Puntuación": 1.5},
+        {"Variable": "Cáncer", "Puntuación": 1.0},
+        {"Variable": "Edad > 75 años", "Puntuación": 1.0},
+    ])
+
+    st.caption("Clasificación: riesgo bajo = 0; riesgo intermedio = 1–4; riesgo alto = > 4.")
+
+    with st.container(border=True):
+        st.markdown("### Variables de la escala")
+
+        with st.form("form_riete"):
+            c1, c2 = st.columns(2, gap="large")
+
+            with c1:
+                edad = st.number_input(
+                    "Edad (años)",
+                    min_value=0,
+                    max_value=120,
+                    value=None,
+                    placeholder="Introduce la edad",
+                    step=1
+                )
+
+                creatinina = st.number_input(
+                    "Creatinina (mg/dL)",
+                    min_value=0.0,
+                    max_value=20.0,
+                    value=None,
+                    placeholder="Introduce la creatinina",
+                    step=0.1,
+                    format="%.1f"
+                )
+
+                hemorragia_reciente = st.radio(
+                    "Hemorragia mayor reciente (último mes)",
+                    ["No", "Sí"],
+                    horizontal=True
+                )
+
+            with c2:
+                anemia = st.radio(
+                    "Anemia",
+                    ["No", "Sí"],
+                    horizontal=True
+                )
+
+                cancer = st.radio(
+                    "Cáncer",
+                    ["No", "Sí"],
+                    horizontal=True
+                )
+
+            submitted = st.form_submit_button("Calcular RIETE", use_container_width=True)
+
+    if submitted:
+        if edad is None:
+            st.error("Introduce la edad del paciente.", icon="⚠️")
+            return
+
+        if creatinina is None:
+            st.error("Introduce el valor de creatinina.", icon="⚠️")
+            return
+
+        desglose = {
+            "Hemorragia mayor reciente (1 mes)": 2.0 if hemorragia_reciente == "Sí" else 0,
+            "Creatinina > 1,2 mg/dL": 1.5 if creatinina > 1.2 else 0,
+            "Anemia": 1.5 if anemia == "Sí" else 0,
+            "Cáncer": 1.0 if cancer == "Sí" else 0,
+            "Edad > 75 años": 1.0 if edad > 75 else 0,
+        }
+
+        puntuacion = sum(desglose.values())
+        categoria, texto = interpretar_riete(puntuacion)
+
+        st.markdown("### Resultado")
+
+        r1, r2, r3 = st.columns(3, gap="large")
+
+        with r1:
+            st.metric("Puntuación total", puntuacion)
+
+        with r2:
+            st.metric("Categoría", categoria)
+
+        with r3:
+            if puntuacion == 0:
+                st.metric("Estrato", "Bajo")
+            elif 1 <= puntuacion <= 4:
+                st.metric("Estrato", "Intermedio")
+            else:
+                st.metric("Estrato", "Alto")
+
+        if puntuacion == 0:
+            st.success(f"**{categoria}**. {texto}", icon="🟢")
+        elif 1 <= puntuacion <= 4:
+            st.warning(f"**{categoria}**. {texto}", icon="🟡")
+        else:
+            st.error(f"**{categoria}**. {texto}", icon="🔴")
+
+        with st.expander("Ver desglose de la puntuación"):
+            for criterio, valor in desglose.items():
+                st.write(f"- {criterio}: **{valor}** punto(s)")
+
+        st.caption(
+            "Según la escala RIETE original: 2 puntos para sangrado reciente, 1,5 para creatinina elevada o anemia, y 1 punto para cáncer y edad > 75 años."
+        )
+
+
+
+
+
 
 
 
@@ -1219,7 +1352,8 @@ elif st.session_state.categoria == "tratamiento":
             "Anticoagulación con heparina de bajo peso molecular",
             "Anticoagulación con perfusión de heparina sódica",
             "Fibrinolisis con alteplasa",
-            "Indicación de trombectomía mecánica"
+            "Indicación de trombectomía mecánica",
+            "Riesgo de sangrado - Escala RIETE"
         ],
         index=None,
         placeholder="Elige una opción",
@@ -1234,8 +1368,11 @@ elif st.session_state.categoria == "tratamiento":
         render_alteplasa()
     elif subcategoria == "Indicación de trombectomía mecánica":
         render_trombect()
+    elif subcategoria == "Riesgo de sangrado - Escala RIETE":
+        render_riete()
     else:
         st.info("Selecciona una opción terapéutica en la barra lateral.")
+
 
 
 
