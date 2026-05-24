@@ -1034,7 +1034,7 @@ def render_alteplasa():
         st.write("- Coordinar monitorización hemodinámica, analítica y plan de anticoagulación posterior.")
         st.write("- Revisar siempre el protocolo local antes de administrar fibrinólisis sistémica.")
 
- def interpretar_trombectomia(criterios_mayores, criterios_menores):
+def interpretar_trombectomia(criterios_mayores, criterios_menores):
     if criterios_mayores >= 1:
         return (
             "Indicada",
