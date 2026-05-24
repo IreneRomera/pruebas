@@ -1034,7 +1034,109 @@ def render_alteplasa():
         st.write("- Coordinar monitorización hemodinámica, analítica y plan de anticoagulación posterior.")
         st.write("- Revisar siempre el protocolo local antes de administrar fibrinólisis sistémica.")
 
-       
+ def interpretar_trombectomia(criterios_mayores, criterios_menores):
+    if criterios_mayores >= 1:
+        return (
+            "Indicada",
+            "Existe al menos 1 criterio mayor. Está indicada la trombectomía mecánica en las próximas 24 horas."
+        )
+    elif criterios_menores > 5:
+        return (
+            "Indicada",
+            "No hay criterios mayores, pero la puntuación de criterios menores es > 5. Está indicada la trombectomía mecánica en las próximas 24 horas."
+        )
+    else:
+        return (
+            "No indicada en este momento",
+            "No se cumplen criterios suficientes para indicar trombectomía mecánica en este momento."
+        )
+
+
+def render_trombect():
+    st.header("Indicación de trombectomía mecánica")
+    st.caption("Herramienta de apoyo para selección de pacientes con TEP de riesgo intermedio-alto.")
+
+    st.info(
+        "Esta herramienta se basa en criterios mayores y menores definidos y validados por el Hospital Clínico San Carlos de Madrid.",
+        icon="🏥"
+    )
+
+    st.warning(
+        "Interpretar junto con situación hemodinámica, imagen, riesgo hemorrágico y valoración multidisciplinar.",
+        icon="⚠️"
+    )
+
+    with st.form("form_trombectomia"):
+        st.markdown("### Criterios mayores")
+        c1, c2, c3 = st.columns(3, gap="large")
+
+        with c1:
+            tromb1 = st.radio("Lactacidemia > 2 mmol/L", ["No", "Sí"], horizontal=True)
+        with c2:
+            tromb2 = st.radio("Shock index ≥ 1", ["No", "Sí"], horizontal=True)
+        with c3:
+            tromb3 = st.radio("Síncope", ["No", "Sí"], horizontal=True)
+
+        st.markdown("### Criterios menores")
+        c4, c5 = st.columns(2, gap="large")
+
+        with c4:
+            tromb4 = st.radio("Trombo acabalgante o en silla de montar", ["No", "Sí"], horizontal=True)
+            tromb5 = st.radio("Disfunción severa del ventrículo derecho", ["No", "Sí"], horizontal=True)
+
+        with c5:
+            tromb6 = st.radio("PaO₂/FiO₂ < 250", ["No", "Sí"], horizontal=True)
+            tromb7 = st.radio("TVP proximal", ["No", "Sí"], horizontal=True)
+
+        submitted = st.form_submit_button("Valorar indicación", use_container_width=True)
+
+    if submitted:
+        mayores = {
+            "Lactacidemia > 2 mmol/L": 1 if tromb1 == "Sí" else 0,
+            "Shock index ≥ 1": 1 if tromb2 == "Sí" else 0,
+            "Síncope": 1 if tromb3 == "Sí" else 0,
+        }
+
+        menores = {
+            "Trombo acabalgante o en silla de montar": 5 if tromb4 == "Sí" else 0,
+            "Disfunción severa del ventrículo derecho": 1 if tromb5 == "Sí" else 0,
+            "PaO₂/FiO₂ < 250": 1 if tromb6 == "Sí" else 0,
+            "TVP proximal": 1 if tromb7 == "Sí" else 0,
+        }
+
+        total_mayores = sum(mayores.values())
+        total_menores = sum(menores.values())
+
+        decision, texto = interpretar_trombectomia(total_mayores, total_menores)
+
+        st.markdown("### Resultado")
+
+        r1, r2, r3 = st.columns(3, gap="large")
+
+        with r1:
+            st.metric("Criterios mayores", total_mayores)
+
+        with r2:
+            st.metric("Puntuación menor", total_menores)
+
+        with r3:
+            st.metric("Decisión", decision)
+
+        if total_mayores >= 1:
+            st.error(texto, icon="🔴")
+        elif total_menores > 5:
+            st.warning(texto, icon="🟡")
+        else:
+            st.success(texto, icon="🟢")
+
+        with st.expander("Ver desglose"):
+            st.write("**Criterios mayores**")
+            for criterio, valor in mayores.items():
+                st.write(f"- {criterio}: **{valor}** punto(s)")
+
+            st.write("**Criterios menores**")
+            for criterio, valor in menores.items():
+                st.write(f"- {criterio}: **{valor}** punto(s)")      
 
 
 
