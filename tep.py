@@ -1138,6 +1138,15 @@ def render_trombect():
             for criterio, valor in menores.items():
                 st.write(f"- {criterio}: **{valor}** punto(s)")      
 
+def interpretar_riete(puntuacion):
+    if puntuacion == 0:
+        return "Riesgo bajo", "La puntuación RIETE es 0."
+    elif 1 <= puntuacion <= 4:
+        return "Riesgo intermedio", "La puntuación RIETE está entre 1 y 4."
+    else:
+        return "Riesgo alto", "La puntuación RIETE es superior a 4."
+
+
 def render_riete():
     st.header("Riesgo de sangrado - Escala RIETE")
     st.caption("Escala RIETE para estimación de riesgo hemorrágico en pacientes con enfermedad tromboembólica venosa.")
