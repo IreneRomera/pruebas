@@ -133,7 +133,7 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 40.0,
         "tipo": "remifentanilo",
         "info_seguridad": """
-- Dosis terapéutica: 0,008–0,05 mcg/kg/min (sedación) hasta 0,5 mcg/kg/min (anestesia).
+- Dosis terapéutica: 0,008–0,05 mcg/kg/min (sedación) hasta 0,2 mcg/kg/min (anestesia).
 - Semi-vida muy corta; ajustar finamente según respuesta."""
     },
     "Dexmedetomidina": {
@@ -392,6 +392,208 @@ def render_modulo_velocidades(peso: float):
                 "recomendaciones de dosis máxima diaria."
             )
 
+def calcular_dosis(farmaco_key: str, peso: float, dilucion: float, velocidad_mlh: float) -> float:
+    """
+    Devuelve la dosis (en las unidades correspondientes) para un fármaco dado,
+    a partir de la velocidad (mL/h) y la dilución.
+    """
+    tipo = FARMACOS_CONFIG[farmaco_key]["tipo"]
+
+    # mcg/kg/min con dilución en mcg/mL o mg/mL*1000
+    if tipo in ("nora_simple", "nora_doble", "remifentanilo",
+                "atracurio", "cisatracurio", "isoprenalina",
+                "landiolol", "esmolol"):
+        if FARMACOS_CONFIG[farmaco_key]["unidad_dilucion"] == "mcg/mL":
+            # dospvc = (vel * dilu) / (peso * 60)
+            dosis = (velocidad_mlh * dilucion) / (peso * 60.0)
+        else:
+            # dilución en mg/mL → mcg/mL = mg/mL * 1000
+            dosis = (velocidad_mlh * (dilucion * 1000.0)) / (peso * 60.0)
+
+    elif tipo in ("dobutamina", "dopamina"):
+        # mcg/kg/min, dilución mg/mL
+        dosis = (velocidad_mlh * (dilucion * 1000.0)) / (peso * 60.0)
+
+    elif tipo in ("propofol", "midazolam", "ketamina", "rocuronio"):
+        # mg/kg/h, dilución mg/mL
+        # dospvc = (vel * dilu) / peso
+        dosis = (velocidad_mlh * dilucion) / peso
+
+    elif tipo in ("morfina", "urapidil", "furosemida", "flumazenilo"):
+        # mg/h, dilución mg/mL
+        # dospvc = vel * dilu
+        dosis = velocidad_mlh * dilucion
+
+    elif tipo == "nitroglicerina":
+        # mg/h, dilución en mcg/mL
+        # dospvc = vel * (dilu/1000)
+        dosis = velocidad_mlh * (dilucion / 1000.0)
+
+    elif tipo in ("fentanilo", "salbutamol", "nimodipino", "dexmedetomidina"):
+        # mcg/kg/h, dilución mcg/mL
+        # dospvc = (vel * dilu) / peso
+        dosis = (velocidad_mlh * dilucion) / peso
+
+    else:
+        dosis = float("nan")
+
+    return dosis
+
+
+
+def render_modulo_dosis(peso: float):
+    st.header("Cálculo de dosis a partir de la velocidad de perfusión")
+    st.write(f"Peso del paciente: **{peso:.1f} kg**")
+
+    farmaco = st.sidebar.selectbox(
+        "Selecciona una medicación",
+        FARMACOS_LISTA,
+        index=None,
+        placeholder="Elige una medicación"
+    )
+
+    if not farmaco:
+        st.info("Selecciona un fármaco en la barra lateral para calcular la dosis.")
+        return
+
+    config = FARMACOS_CONFIG[farmaco]
+    unidad_dosis = config["unidad_dosis"]
+    unidad_dilucion = config["unidad_dilucion"]
+    dilu_default = config["dilucion_normalizada"]
+    tipo = config["tipo"]
+
+    st.subheader(farmaco)
+
+    # Dilución: valor normalizado por defecto pero editable
+    dilucion = st.number_input(
+        f"Dilución ({unidad_dilucion})",
+        min_value=0.0001,
+        value=float(dilu_default),
+        step=max(dilu_default / 100.0, 0.01),
+        format="%.4f",
+        help=(
+            f"Dilución normalizada habitual: {dilu_default} {unidad_dilucion}. "
+            "Modifícala si tu preparación difiere."
+        ),
+        key=f"dilucion_{tipo}"
+    )
+
+    # Velocidad de perfusión en mL/h
+    velocidad_mlh = st.number_input(
+        "Velocidad de la perfusión (mL/h)",
+        min_value=0.0,
+        value=0.0,
+        step=0.1,
+        format="%.2f",
+        key=f"velocidad_{tipo}"
+    )
+
+    if st.button("Calcular dosis", key=f"calc_dosis_{tipo}"):
+        dosis = calcular_dosis(farmaco, peso, dilucion, velocidad_mlh)
+
+        if not dosis or dosis != dosis:
+            st.error("No se ha podido calcular la dosis con los parámetros introducidos.")
+            return
+
+        # Redondeo especial para algunos fármacos donde en consola ya redondeabas
+        if tipo in ("isoprenalina", "esmolol", "landiolol", "nimodipino", "flumazenilo"):
+            dosis_mostrar = round(dosis, 1)
+        else:
+            dosis_mostrar = dosis
+
+        st.success(
+            f"Dosis calculada: **{dosis_mostrar:.4f} {unidad_dosis}**"
+        )
+
+        st.markdown("### Límites de seguridad y consideraciones")
+        st.info(config["info_seguridad"])
+
+        # Avisos si nos salimos de los rangos del PDF
+        if tipo in ("nora_simple", "nora_doble"):
+            # 0,05–1 mcg/kg/min
+            if dosis < 0.05:
+                st.warning(
+                    "La dosis calculada está por debajo de 0,05 mcg/kg/min, "
+                    "por debajo del rango terapéutico habitual."
+                )
+            elif dosis > 1.0:
+                st.error(
+                    "La dosis calculada supera 1 mcg/kg/min, máxima recomendada "
+                    "para noradrenalina base."
+                )
+
+        if tipo == "dobutamina":
+            # 2,5–15 mcg/kg/min, máx 40
+            if dosis < 2.5:
+                st.warning("La dosis de dobutamina está por debajo de 2,5 mcg/kg/min.")
+            elif dosis > 40.0:
+                st.error("La dosis de dobutamina supera 40 mcg/kg/min, máximo recomendado.")
+
+        if tipo == "dopamina":
+            # rango 2–50 mcg/kg/min
+            if dosis < 2.0:
+                st.warning("La dosis de dopamina está por debajo de 2 mcg/kg/min.")
+            elif dosis > 50.0:
+                st.error("La dosis de dopamina supera 50 mcg/kg/min, por encima del rango usual.")
+
+        if tipo == "cisatracurio":
+            # 0,5–5 mcg/kg/min, máx 10,2
+            if dosis < 0.5:
+                st.warning("La dosis de cisatracurio está por debajo de 0,5 mcg/kg/min.")
+            elif dosis > 10.2:
+                st.error("La dosis de cisatracurio supera 10,2 mcg/kg/min, máximo recomendado.")
+
+        if tipo == "isoprenalina":
+            # máx 0,15 mcg/kg/min
+            if dosis > 0.15:
+                st.error("La dosis de isoprenalina supera 0,15 mcg/kg/min, máximo recomendado.")
+
+        if tipo == "nitroglicerina":
+            # eficaz 3–6 mg/h, máx 10 mg/h
+            if dosis < 3.0:
+                st.warning("La dosis de nitroglicerina está por debajo de 3 mg/h.")
+            elif dosis > 10.0:
+                st.error(
+                    "La dosis de nitroglicerina supera 10 mg/h (~170 mcg/min), "
+                    "máximo recomendado."
+                )
+
+        if tipo == "flumazenilo":
+            # máx 0,4 mg/h, tóxica hasta 2 mg/h
+            if dosis > 0.4:
+                st.warning(
+                    "La dosis de flumazenilo supera 0,4 mg/h; recuerda que dosis tóxicas "
+                    "se sitúan en torno a 2 mg/h."
+                )
+
+        if tipo == "dexmedetomidina":
+            # 0,2–1,4 mcg/kg/h
+            if dosis < 0.2:
+                st.warning("La dosis de dexmedetomidina está por debajo de 0,2 mcg/kg/h.")
+            elif dosis > 1.4:
+                st.warning(
+                    "La dosis de dexmedetomidina supera 1,4 mcg/kg/h, por encima "
+                    "del rango terapéutico."
+                )
+
+        if tipo == "nimodipino":
+            # 15–30 mcg/kg/h, con límite 7,5 en <70kg o inestabilidad
+            st.info(
+                "Recuerda: inicio habitual a 15 mcg/kg/h durante 2 h, luego 30 mcg/kg/h "
+                "si bien tolerado; en <70 kg o inestabilidad hemodinámica, no superar "
+                "7,5 mcg/kg/h."
+            )
+
+        if tipo == "landiolol":
+            # inicial 10–40 mcg/kg/min, máxima diaria 57,6 mcg/kg/día
+            if dosis > 40.0:
+                st.warning(
+                    "La dosis de landiolol supera 40 mcg/kg/min; revisa que se mantiene "
+                    "dentro de la dosis máxima diaria recomendada."
+                )
+                
+                
+
 
 
 
@@ -423,17 +625,12 @@ if st.sidebar.button("Hacer un cálculo manual a partir de una dilución", use_c
 # ------------------------------
 # Contenido principal según categoría
 # ------------------------------
-opciones_medicacion = [
-    "Noradrenalina base (simple = 8 mg)",
-    "Noradrenalina base (doble = 16 mg)",
-    "etc",
-    "Introducir manualmente"
-]
 
 if st.session_state.categoria == "velocidad":
     render_modulo_velocidades(peso)
 
-#elif st.session_state.categoria == "dosis":
+elif st.session_state.categoria == "dosis":
+    render_modulo_dosis(peso)
 
 
 else:
