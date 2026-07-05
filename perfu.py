@@ -497,7 +497,7 @@ def render_modulo_dosis(peso: float):
 
         # Redondeo especial para algunos fármacos donde en consola ya redondeabas
         if tipo in ("isoprenalina", "esmolol", "landiolol", "nimodipino", "flumazenilo"):
-            dosis_mostrar = round(dosis, 1)
+            dosis_mostrar = round(dosis, 0)
         else:
             dosis_mostrar = dosis
 
