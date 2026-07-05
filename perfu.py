@@ -593,6 +593,232 @@ def render_modulo_dosis(peso: float):
                 )
                 
                 
+# ---- Conversión: dilución en mg/mL -> dosis a partir de velocidad ----
+def mgtomcgkgmin(peso, diluc, vel):
+    # mg/mL -> mcg/kg/min
+    return (vel * (diluc * 1000.0)) / (peso * 60.0)
+
+def mgtomcgkgh(peso, diluc, vel):
+    # mg/mL -> mcg/kg/h
+    return (vel * (diluc * 1000.0)) / peso
+
+def mgtomgkgh(peso, diluc, vel):
+    # mg/mL -> mg/kg/h
+    return (vel * diluc) / peso
+
+def mgtomgh(peso, diluc, vel):
+    # mg/mL -> mg/h
+    return vel * diluc
+
+
+# ---- Conversión: dilución en mcg/mL -> dosis a partir de velocidad ----
+def mcgtomcgkgmin(peso, diluc, vel):
+    # mcg/mL -> mcg/kg/min
+    return (vel * diluc) / (peso * 60.0)
+
+def mcgtomcgkgh(peso, diluc, vel):
+    # mcg/mL -> mcg/kg/h
+    return (vel * diluc) / peso
+
+def mcgtomgkgh(peso, diluc, vel):
+    # mcg/mL -> mg/kg/h
+    return (vel * (diluc / 1000.0)) / peso
+
+def mcgtomgh(peso, diluc, vel):
+    # mcg/mL -> mg/h
+    return vel * (diluc / 1000.0)
+
+
+# ---- Conversión: dilución en mg/mL -> velocidad a partir de dosis ----
+def mgfrommcgkgmin(peso, diluc, dosis):
+    # mg/mL & dosis mcg/kg/min -> mL/h
+    return (dosis * 60.0 * peso) / (diluc * 1000.0)
+
+def mgfrommcgkgh(peso, diluc, dosis):
+    # mg/mL & dosis mcg/kg/h -> mL/h
+    return (dosis * peso) / (diluc * 1000.0)
+
+def mgfrommgkgh(peso, diluc, dosis):
+    # mg/mL & dosis mg/kg/h -> mL/h
+    return (dosis * peso) / diluc
+
+def mgfrommgh(peso, diluc, dosis):
+    # mg/mL & dosis mg/h -> mL/h
+    return dosis / diluc
+
+
+# ---- Conversión: dilución en mcg/mL -> velocidad a partir de dosis ----
+def mcgfrommcgkgmin(peso, diluc, dosis):
+    # mcg/mL & dosis mcg/kg/min -> mL/h
+    return (dosis * 60.0 * peso) / diluc
+
+def mcgfrommcgkgh(peso, diluc, dosis):
+    # mcg/mL & dosis mcg/kg/h -> mL/h
+    return (dosis * peso) / diluc
+
+def mcgfrommgkgh(peso, diluc, dosis):
+    # mcg/mL & dosis mg/kg/h -> mL/h
+    return (dosis * peso) / (diluc / 1000.0)
+
+def mcgfrommgh(peso, diluc, dosis):
+    # mcg/mL & dosis mg/h -> mL/h
+    return dosis / (diluc / 1000.0)
+
+
+UNIDADES_DILUCION = ["mg/mL", "mcg/mL"]
+UNIDADES_DOSIS = ["mcg/kg/min", "mcg/kg/h", "mg/kg/h", "mg/h"]
+
+
+def render_modulo_manual(peso: float):
+    st.header("Módulo de cálculo manual")
+
+    st.write(
+        "Introduce la dilución y elige qué quieres calcular: "
+        "dosis a partir de una velocidad, o velocidad a partir de una dosis."
+    )
+
+    # 1) Dilución y unidad de dilución
+    st.subheader("Dilución de la perfusión")
+
+    dilucion = st.number_input(
+        "Valor de la dilución",
+        min_value=0.0001,
+        value=1.0,
+        step=0.1,
+        format="%.4f",
+        help="Introduce la concentración real de la perfusión que estás utilizando."
+    )
+
+    unidad_dilucion = st.selectbox(
+        "Unidad de la dilución",
+        UNIDADES_DILUCION,
+        index=0,
+        help="Selecciona si la dilución está expresada en mg/mL o mcg/mL."
+    )
+
+    st.markdown("---")
+
+    # 2) Elegir qué módulo usar: dosis desde velocidad o velocidad desde dosis
+    modo = st.radio(
+        "¿Qué deseas calcular?",
+        ["Dosis a partir de velocidad", "Velocidad a partir de dosis"],
+        index=0
+    )
+
+    if modo == "Dosis a partir de velocidad":
+        _render_manual_dosis_desde_velocidad(peso, dilucion, unidad_dilucion)
+    else:
+        _render_manual_velocidad_desde_dosis(peso, dilucion, unidad_dilucion)
+
+
+
+
+def _render_manual_dosis_desde_velocidad(peso: float, dilucion: float, unidad_dilucion: str):
+    st.subheader("Calcular dosis a partir de una velocidad")
+
+    st.write(f"Peso del paciente: **{peso:.1f} kg**")
+
+    # Velocidad de la perfusión en mL/h
+    velocidad = st.number_input(
+        "Velocidad de la perfusión (mL/h)",
+        min_value=0.0,
+        value=0.0,
+        step=0.1,
+        format="%.2f",
+        key="manual_velocidad_para_dosis"
+    )
+
+    # Unidad de dosis que el usuario quiere obtener
+    unidad_dosis = st.selectbox(
+        "Unidad de la dosis que deseas obtener",
+        UNIDADES_DOSIS,
+        index=0,
+        key="manual_unidad_dosis_salida"
+    )
+
+    if st.button("Calcular dosis", key="manual_calc_dosis"):
+        if velocidad <= 0:
+            st.warning("Introduce una velocidad de perfusión mayor que 0 mL/h.")
+            return
+
+        # Seleccionar función adecuada según unidad de dilución y de dosis
+        if unidad_dilucion == "mg/mL":
+            if unidad_dosis == "mcg/kg/min":
+                resultado = mgtomcgkgmin(peso, dilucion, velocidad)
+            elif unidad_dosis == "mcg/kg/h":
+                resultado = mgtomcgkgh(peso, dilucion, velocidad)
+            elif unidad_dosis == "mg/kg/h":
+                resultado = mgtomgkgh(peso, dilucion, velocidad)
+            else:  # "mg/h"
+                resultado = mgtomgh(peso, dilucion, velocidad)
+
+        else:  # "mcg/mL"
+            if unidad_dosis == "mcg/kg/min":
+                resultado = mcgtomcgkgmin(peso, dilucion, velocidad)
+            elif unidad_dosis == "mcg/kg/h":
+                resultado = mcgtomcgkgh(peso, dilucion, velocidad)
+            elif unidad_dosis == "mg/kg/h":
+                resultado = mcgtomgkgh(peso, dilucion, velocidad)
+            else:  # "mg/h"
+                resultado = mcgtomgh(peso, dilucion, velocidad)
+
+        st.success(
+            f"La dosis calculada es **{resultado:.4f} {unidad_dosis}**."
+        )
+        
+
+def _render_manual_velocidad_desde_dosis(peso: float, dilucion: float, unidad_dilucion: str):
+    st.subheader("Calcular velocidad a partir de una dosis")
+
+    st.write(f"Peso del paciente: **{peso:.1f} kg**")
+
+    # Dosis numérica
+    dosis = st.number_input(
+        "Valor de la dosis",
+        min_value=0.0,
+        value=0.0,
+        step=0.01,
+        format="%.4f",
+        key="manual_dosis_para_velocidad"
+    )
+
+    unidad_dosis = st.selectbox(
+        "Unidad en la que está expresada la dosis",
+        UNIDADES_DOSIS,
+        index=0,
+        key="manual_unidad_dosis_entrada"
+    )
+
+    if st.button("Calcular velocidad", key="manual_calc_velocidad"):
+        if dosis <= 0:
+            st.warning("Introduce una dosis mayor que 0.")
+            return
+
+        if unidad_dilucion == "mg/mL":
+            if unidad_dosis == "mcg/kg/min":
+                resultado = mgfrommcgkgmin(peso, dilucion, dosis)
+            elif unidad_dosis == "mcg/kg/h":
+                resultado = mgfrommcgkgh(peso, dilucion, dosis)
+            elif unidad_dosis == "mg/kg/h":
+                resultado = mgfrommgkgh(peso, dilucion, dosis)
+            else:  # "mg/h"
+                resultado = mgfrommgh(peso, dilucion, dosis)
+
+        else:  # "mcg/mL"
+            if unidad_dosis == "mcg/kg/min":
+                resultado = mcgfrommcgkgmin(peso, dilucion, dosis)
+            elif unidad_dosis == "mcg/kg/h":
+                resultado = mcgfrommcgkgh(peso, dilucion, dosis)
+            elif unidad_dosis == "mg/kg/h":
+                resultado = mcgfrommgkgh(peso, dilucion, dosis)
+            else:  # "mg/h"
+                resultado = mcgfrommgh(peso, dilucion, dosis)
+
+        st.success(
+            f"La velocidad requerida es **{resultado:.2f} mL/h**."
+        )
+
+
 
 
 
@@ -632,6 +858,8 @@ if st.session_state.categoria == "velocidad":
 elif st.session_state.categoria == "dosis":
     render_modulo_dosis(peso)
 
+elif st.session_state.categoria == "manual":
+    render_modulo_manual(peso)
 
 else:
     st.info("Elige en la barra lateral si quieres calcular velocidad o dosis.")
