@@ -106,6 +106,7 @@ FARMACOS_CONFIG = {
 - Dosis de mantenimiento en adultos inestables/hipovolemia/cardiópatas o ancianos para anestesia--> reducir dosis según indicación.
 - Dosis de mantenimiento en adultos para sedación en procedimientos --> 1,5 - 4,5 mg/kg/h
 """
+        },
     "Midazolam": {
         "unidad_dosis": "mg/kg/h",
         "unidad_dilucion": "mg/mL",
