@@ -52,7 +52,9 @@ FARMACOS_CONFIG = {
         "info_seguridad": """
 - Dosis terapéutica habitual: 0,05 mcg/kg/min y aumentar según respuesta.
 - Dosis máxima recomendada: 1 mcg/kg/min.
-- Preferente vía central (riesgo de necrosis ante extravasación).
+- Proteger la jeringa de la luz.
+- Preferente vía central; extravasación puede producir necrosis (considerar fentolamina).
+- Validez de 24 horas.
 """
     },
     "Noradrenalina base (doble)": {
@@ -63,7 +65,9 @@ FARMACOS_CONFIG = {
         "info_seguridad": """
 - Dosis terapéutica habitual: 0,05 mcg/kg/min y aumentar según respuesta.
 - Dosis máxima recomendada: 1 mcg/kg/min.
-- Preferente vía central (riesgo de necrosis ante extravasación).
+- Proteger la jeringa de la luz.
+- Preferente vía central; extravasación puede producir necrosis (considerar fentolamina).
+- Validez de 24 horas.
 """
     },
     "Dobutamina": {
@@ -74,7 +78,9 @@ FARMACOS_CONFIG = {
         "info_seguridad": """
 - Dosis terapéutica: 2,5–15 mcg/kg/min.
 - Dosis máxima: hasta 40 mcg/kg/min.
-- Preferente vía central; extravasación puede producir necrosis (considerar fentolamina)."""
+- Preferente vía central; extravasación puede producir necrosis (considerar fentolamina).
+- Validez de 24 horas.
+"""
     },
     "Dopamina": {
         "unidad_dosis": "mcg/kg/min",
@@ -83,7 +89,9 @@ FARMACOS_CONFIG = {
         "tipo": "dopamina",
         "info_seguridad": """
 - Dosis habitual: 2–50 mcg/kg/min.
-- Preferente vía central; extravasación puede producir necrosis (considerar fentolamina)."""
+- Preferente vía central; extravasación puede producir necrosis (considerar fentolamina).
+- Validez de 24 horas.
+"""
     },
     "Propofol": {
         "unidad_dosis": "mg/kg/h",
@@ -91,8 +99,13 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 20.0,
         "tipo": "propofol",
         "info_seguridad": """
-- Emulsión lipídica, vigilar dosis acumuladas y riesgo de síndrome de perfusión de propofol."""
-    },
+- Emulsión lipídica, vigilar dosis acumuladas y riesgo de síndrome de perfusión de propofol.
+- Dosis de mantenimiento en adultos para sedación en UCI --> 0,3 - 4 mg/kg/h
+- Dosis de mantenimiento en adultos para anestesia y cirugía general --> 4 - 12 mg/kg/h
+- Dosis de mantenimiento en adultos para anestesia y cirugía poco estresante/mínimamente invasiva --> 4 mg/kg/h
+- Dosis de mantenimiento en adultos inestables/hipovolemia/cardiópatas o ancianos para anestesia--> reducir dosis según indicación.
+- Dosis de mantenimiento en adultos para sedación en procedimientos --> 1,5 - 4,5 mg/kg/h
+"""
     "Midazolam": {
         "unidad_dosis": "mg/kg/h",
         "unidad_dilucion": "mg/mL",
