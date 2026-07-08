@@ -54,7 +54,7 @@ FARMACOS_CONFIG = {
 - Dosis máxima recomendada: 1 mcg/kg/min.
 - Proteger la jeringa de la luz.
 - Preferente vía central; extravasación puede producir necrosis (considerar fentolamina).
-- Validez de 24 horas.
+- Estabilidad por 24 horas.
 """
     },
     "Noradrenalina base (doble)": {
@@ -67,7 +67,7 @@ FARMACOS_CONFIG = {
 - Dosis máxima recomendada: 1 mcg/kg/min.
 - Proteger la jeringa de la luz.
 - Preferente vía central; extravasación puede producir necrosis (considerar fentolamina).
-- Validez de 24 horas.
+- Estabilidad por 24 horas.
 """
     },
     "Dobutamina": {
@@ -79,7 +79,7 @@ FARMACOS_CONFIG = {
 - Dosis terapéutica: 2,5–15 mcg/kg/min.
 - Dosis máxima: hasta 40 mcg/kg/min.
 - Preferente vía central; extravasación puede producir necrosis (considerar fentolamina).
-- Validez de 24 horas.
+- Estabilidad por 24 horas.
 """
     },
     "Dopamina": {
@@ -90,7 +90,7 @@ FARMACOS_CONFIG = {
         "info_seguridad": """
 - Dosis habitual: 2–50 mcg/kg/min.
 - Preferente vía central; extravasación puede producir necrosis (considerar fentolamina).
-- Validez de 24 horas.
+- Estabilidad por 24 horas.
 """
     },
     "Propofol": {
@@ -106,13 +106,14 @@ FARMACOS_CONFIG = {
 - Dosis de mantenimiento en adultos inestables/hipovolemia/cardiópatas o ancianos para anestesia--> reducir dosis según indicación.
 - Dosis de mantenimiento en adultos para sedación en procedimientos --> 1,5 - 4,5 mg/kg/h
 """
-        },
+    },
     "Midazolam": {
         "unidad_dosis": "mg/kg/h",
         "unidad_dilucion": "mg/mL",
         "dilucion_normalizada": 1.0,
         "tipo": "midazolam",
         "info_seguridad": """
+- Dosis recomendada para sedación de adultos en UCI --> 0,01 - 0,2 mg/kg/h.
 - Vigilar sedación y función respiratoria; considerar ajuste en insuficiencia hepática/renal."""
     },
     "Ketamina": {
@@ -121,7 +122,9 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 1.0,  # rango habitual 1–2 mg/mL
         "tipo": "ketamina",
         "info_seguridad": """
-- Dilución habitual 1–2 mg/mL.
+- Dilución habitual: 1–2 mg/mL.
+- Dosis recomendada para perfusión de analgesia --> 0,5 - 1 mg/kg/h.
+- Dosis recomendada como anestésico --> 1 - 3 mg/kg/h.
 - Monitorizar efectos neuropsiquiátricos y hemodinámicos."""
     },
     "Morfina": {
@@ -130,7 +133,9 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 0.2,  # rango habitual 0,2–0,4 mg/mL
         "tipo": "morfina",
         "info_seguridad": """
-- Dilución habitual 0,2–0,4 mg/mL.
+- Dilución habitual: 0,2–0,4 mg/mL.
+- Dosis recomendada inicialmente --> 0,8 - 10 mg/h.
+- Se podría aumentar hasta dosis de 80 mg/h.
 - Monitorizar depresión respiratoria y sedación."""
     },
     "Fentanilo": {
@@ -139,7 +144,10 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 15.0,
         "tipo": "fentanilo",
         "info_seguridad": """
-- Perfusión continua: ajustar según respuesta clínica y función respiratoria."""
+- Dosis inicial de 1 mcg/kg/min. Rango de dosis —> 0,5 - 3 mcg/kg/min.
+- Para mantener la respiración espontánea se recomiendan dosis más bajas —> 0,05 - 0,08 mcg/kg/min.
+- En pacientes obesos se recomienda utilizar el peso ideal para realizar el cálculo de dosis.
+- Se recomienda reducir la dosis en pacientes con insuficiencia renal y en pacientes de edad avanzada."""
     },
     "Remifentanilo": {
         "unidad_dosis": "mcg/kg/min",
@@ -147,7 +155,7 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 40.0,
         "tipo": "remifentanilo",
         "info_seguridad": """
-- Dosis terapéutica: 0,008–0,05 mcg/kg/min (sedación) hasta 0,2 mcg/kg/min (anestesia).
+- Dosis terapéutica --> 0,008 – 0,05 mcg/kg/min (sedación) hasta 0,2 mcg/kg/min (anestesia).
 - Semi-vida muy corta; ajustar finamente según respuesta."""
     },
     "Dexmedetomidina": {
@@ -156,7 +164,7 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 4.0,
         "tipo": "dexmedetomidina",
         "info_seguridad": """
-- Dosis terapéutica: 0,2–1,4 mcg/kg/h.
+- Dosis terapéutica: 0,2 – 1,4 mcg/kg/h.
 - Monitorizar FC y TA (riesgo de bradicardia/hipotensión)."""
     },
     "Atracurio": {
@@ -165,7 +173,12 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 5.0,
         "tipo": "atracurio",
         "info_seguridad": """
-- Bloqueante neuromuscular; requiere monitorización del bloqueo y ajuste según respuesta."""
+- Bloqueante neuromuscular; requiere monitorización del bloqueo y ajuste según respuesta.
+- Para el bloqueo neuromuscular en paciente crítico (UCI) se recomienda la siguiente dosis --> 10 - 13 mcg/kg/min.
+- Existe una gran variabilidad interindividual así como en el tiempo.
+- En caso de hipotermia se recomienda reducir la dosis aproximadamente a la mitad.
+- No precisa ajuste en casos de insuficiencia renal y/o hepática.
+"""
     },
     "Cisatracurio": {
         "unidad_dosis": "mcg/kg/min",
@@ -173,8 +186,10 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 2.0,
         "tipo": "cisatracurio",
         "info_seguridad": """
-- Dosis terapéutica: 0,5–5 mcg/kg/min; máximo 10,2 mcg/kg/min.
-- Perfusión inicial 3 mcg/kg/min, luego 1–2 mcg/kg/min."""
+- Dosis terapéutica --> 0,5 – 5 mcg/kg/min; máximo 10,2 mcg/kg/min.
+- No precisa ajuste en casos de insuficiencia renal y/o hepática.
+- Estabilidad por 24 horas.
+"""
     },
     "Rocuronio": {
         "unidad_dosis": "mg/kg/h",
@@ -182,7 +197,10 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 10.0,
         "tipo": "rocuronio",
         "info_seguridad": """
-- Bloqueante neuromuscular; administrar con monitorización de bloqueo y soporte ventilatorio."""
+- Bloqueante neuromuscular; administrar con monitorización de bloqueo y soporte ventilatorio.
+- En adultos, la dosis en perfusión continua recomendada se sitúa entre --> 0,3 - 0,6 mg/kg/h bajo anestesia intravenosa; 0,3 - 0,4 mg/kg/h bajo anestesia inhalatoria.
+- Se recomienda reducir la dosis en casos de insuficiencia renal y/o hepática.
+"""
     },
     "Urapidil": {
         "unidad_dosis": "mg/h",
