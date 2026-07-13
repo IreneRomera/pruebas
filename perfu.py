@@ -208,7 +208,11 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 2.0,
         "tipo": "urapidil",
         "info_seguridad": """
-- Vasodilatador periférico; vigilar TA y riesgo de hipotensión."""
+- Vasodilatador periférico; vigilar TA y riesgo de hipotensión.
+- Para el manejo de PA perioperatoria se recomiendan dosis entre -—> 60-180 mg/h.
+- Para el manejo de una emergencia hipertensiva se rcomiendan dosis entre  -—> 9-30 mg/h.
+- Estabilidad durante 50 horas.
+"""
     },
     "Furosemida": {
         "unidad_dosis": "mg/h",
@@ -217,7 +221,8 @@ FARMACOS_CONFIG = {
         "tipo": "furosemida",
         "info_seguridad": """
 - Dosis habitual: 5–40 mg/h.
-- Velocidades >4 mg/min aumentan riesgo de ototoxicidad; administrar lentamente."""
+- Velocidades elevadas aumentan riesgo de ototoxicidad.
+"""
     },
     "Isoprenalina": {
         "unidad_dosis": "mcg/kg/min",
@@ -225,7 +230,8 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 40.0,
         "tipo": "isoprenalina",
         "info_seguridad": """
-- Dosis inicial: 0,02–0,04 mcg/kg/min; dosis máxima recomendada: 0,15 mcg/kg/min."""
+- Dosis inicial: 0,02–0,04 mcg/kg/min; dosis máxima recomendada: 0,15 mcg/kg/min.
+"""
     },
     "Esmolol": {
         "unidad_dosis": "mcg/kg/min",
@@ -233,18 +239,22 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 10.0,
         "tipo": "esmolol",
         "info_seguridad": """
-- Recomendada dosis de carga 0,5–1 mg/kg en bolo.
-- Perfusión según respuesta; monitorizar TA y FC."""
+- Dosis de mantenimiento eficaz entre --> 50 - 200 mcg/kg/min.
+- No se recomienda superar los 300 mcg/kg/min.
+- Se recomienda monitorización continua y estricta de PA y FC.
+"""
     },
     "Nitroglicerina": {
         "unidad_dosis": "mg/h",
         "unidad_dilucion": "mcg/mL",
-        "dilucion_normalizada": 200.0,  # rango habitual 200–1000 mcg/mL
+        "dilucion_normalizada": 1000.0,  # rango habitual 200–1000 mcg/mL
         "tipo": "nitroglicerina",
         "info_seguridad": """
-- Respuesta efectiva suele alcanzarse con 3–6 mg/h (50–100 mcg/min).
+- Se recomienda una dosis inicial de --> 0,3 mg/h (5 mcg/min).
+- Una respuesta efectiva suele alcanzarse con dosis entre --> 3–6 mg/h (50–100 mcg/min).
 - Dosis máxima recomendada: 10 mg/h (170 mcg/min).
-- Evitar PVC por retención del fármaco; usar materiales no-PVC."""
+- Evitar materiales PVC por retención del fármaco; usar materiales no-PVC.
+"""
     },
     "Salbutamol": {
         "unidad_dosis": "mcg/kg/h",
@@ -252,7 +262,10 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 20.0,
         "tipo": "salbutamol",
         "info_seguridad": """
-- Ajustar dosis en función de respuesta clínica y efectos secundarios (taquicardia, temblor)."""
+- Dilución de 2000 mcg (4 ampollas de 500 mcg) en 100 mL de suero fisiológico.
+- Se recomiendan dosis entre --> 4 - 8 mcg/kg/h. 
+- Ajustar la dosis en función de respuesta clínica y efectos secundarios (taquicardia, temblor).
+"""
     },
     "Nimodipino": {
         "unidad_dosis": "mcg/kg/h",
@@ -260,8 +273,9 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 200.0,
         "tipo": "nimodipino",
         "info_seguridad": """
-- Inicio habitual 15 mcg/kg/h durante 2 h, luego 30 mcg/kg/h si bien tolerado.
-- En <70 kg o inestabilidad hemodinámica, no superar 7,5 mcg/kg/h."""
+- Inicio habitual 15 mcg/kg/h durante 2 h, luego se puede aumentar hasta 30 mcg/kg/h si es bien tolerado.
+- En < 70 kg o inestabilidad hemodinámica, no superar los 7,5 mcg/kg/h.
+"""
     },
     "Flumazenilo": {
         "unidad_dosis": "mg/h",
@@ -269,8 +283,9 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 0.04,
         "tipo": "flumazenilo",
         "info_seguridad": """
-- Dosis máxima recomendada 0,4 mg/h; dosis tóxica hasta 2 mg/h.
-- Vigilar convulsiones en pacientes con uso crónico de benzodiacepinas."""
+- Dosis máxima recomendada --> 0,4 mg/h; dosis tóxica hasta 2 mg/h.
+- Vigilar convulsiones en pacientes con uso crónico de benzodiacepinas.
+"""
     },
     "Landiolol": {
         "unidad_dosis": "mcg/kg/min",
@@ -278,8 +293,10 @@ FARMACOS_CONFIG = {
         "dilucion_normalizada": 6.0,
         "tipo": "landiolol",
         "info_seguridad": """
-- Dosis inicial: 10–40 mcg/kg/min; dosis máxima diaria: 57,6 mcg/kg/día.
-- Puede usarse dosis de carga 100 mcg/kg/min durante 1 min."""
+- Se recomienda una dosis inicial entre --> 10–40 mcg/kg/min.
+- Dosis máxima diaria de 57,6 mcg/kg/día.
+- Puede usarse dosis de carga durante 1 min (igual al peso corporal, es decir, para paciente de 70kg, administrar landiolol a 70ml/h durante 1 min).
+"""
     },
 }
 
