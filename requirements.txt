@@ -1,2 +1,5 @@
 streamlit
 streamlit-extras
+streamlit>=1.40
+pandas
+reportlab
