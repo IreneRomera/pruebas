@@ -56,20 +56,37 @@ st.subheader("⬅ Introduce los datos en la barra lateral y genera el informe")
 def formato_numero(valor, decimales=2):
     """Formato numérico para pantalla y PDF."""
     if valor is None:
-        return "No calculable"
+        return "No disponible"
 
     return f"{valor:.{decimales}f}".replace(".", ",")
 
 
 def calcular_resultados(mediciones, area_previa):
-    """Calcula las medias, el cociente y el delta sin redondear."""
+    """Calcula los resultados sin redondeos intermedios."""
     media_y = mean(m["eje_y"] for m in mediciones)
-    media_relajacion = mean(m["relajacion"] for m in mediciones)
-    media_contraccion = mean(m["contraccion"] for m in mediciones)
+
+    media_relajacion = mean(
+        m["relajacion"] for m in mediciones
+    )
+
+    areas_contraccion = [
+        m["contraccion"] for m in mediciones
+    ]
+
+    contraccion_completa = all(
+        valor is not None
+        for valor in areas_contraccion
+    )
+
+    media_contraccion = (
+        mean(areas_contraccion)
+        if contraccion_completa
+        else None
+    )
 
     cociente = (
-        media_relajacion/ media_contraccion
-        if media_relajacion > 0
+        media_contraccion / media_relajacion
+        if media_contraccion is not None and media_relajacion > 0
         else None
     )
 
@@ -196,9 +213,23 @@ def generar_pdf(informe):
     )
 
     texto("Cociente de áreas", "Heading2")
-    texto(
-        "Media del área en contracción / media del área en relajación: "
-        f"{formato_numero(resultados['cociente'], 4)}."
+
+    if resultados["media_contraccion"] is None:
+        texto(
+            "No disponible: no se han introducido las tres áreas "
+            "en contracción. Este cálculo es opcional."
+    )
+
+    elif resultados["media_relajacion"] == 0:
+        texto(
+            "No calculable: la media del área en relajación es cero."
+    )
+
+    else:
+        texto(
+            "Media del área en contracción / "
+            "media del área en relajación: "
+            f"{formato_numero(resultados['cociente'], 4)}."
     )
 
     texto("Características adicionales", "Heading2")
@@ -290,16 +321,24 @@ def mostrar_informe(informe):
 
     st.subheader("Cociente de áreas")
 
-    st.metric(
-        "Contracción / relajación",
-        formato_numero(resultados["cociente"], 4),
-    )
+    if resultados["media_contraccion"] is None:
+        st.info(
+            "Cociente de áreas no disponible: "
+            "no se han introducido las tres áreas en contracción. "
+            "Este cálculo es opcional."
+            )
 
-    if resultados["cociente"] is None:
-        st.warning(
-            "No se puede calcular el cociente porque "
+    elif resultados["media_relajacion"] == 0:
+        st.info(
+            "Cociente de áreas no calculable: "
             "la media del área en relajación es cero."
-        )
+            )
+
+    else:
+        st.metric(
+            "Contracción / relajación",
+            formato_numero(resultados["cociente"], 4),
+            )
 
     st.subheader("Características adicionales")
 
@@ -442,13 +481,18 @@ with st.sidebar:
             )
 
             contraccion = st.number_input(
-                "Área en contracción (cm²)",
+                "Área en contracción (cm²) — opcional",
                 min_value=0.0,
                 value=None,
                 step=0.01,
                 format="%.3f",
                 key=f"eco_contraccion_{numero}",
-            )
+                help=(
+                    "Puedes dejar este campo vacío. "
+                    "La media en contracción y el cociente de áreas "
+                    "solo se calcularán si completas las tres mediciones."
+                    ),
+                )
 
             mediciones.append({
                 "eje_y": eje_y,
@@ -520,19 +564,18 @@ if generar:
     if lado is None:
         errores.append("Selecciona el lado.")
 
+    # Solo son obligatorios el eje Y y el área en relajación.
     nombres_campos = {
-        "eje_y": "eje Y",
-        "relajacion": "área en relajación",
-        "contraccion": "área en contracción",
+    "eje_y": "eje Y",
+    "relajacion": "área en relajación",
     }
 
     for numero, medicion in enumerate(mediciones, start=1):
-        for campo, valor in medicion.items():
-            if valor is None:
+        for campo, nombre in nombres_campos.items():
+            if medicion[campo] is None:
                 errores.append(
-                    f"Completa {nombres_campos[campo]} "
-                    f"de la medición {numero}."
-                )
+                f"Completa {nombre} de la medición {numero}."
+            )
 
     if grosor_tendon is None:
         errores.append("Introduce el grosor del tendón.")
