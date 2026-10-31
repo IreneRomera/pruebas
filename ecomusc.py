@@ -324,6 +324,7 @@ def interpretar_informe(informe):
         [texto_cociente],
     ))
 
+    return bloques
 
 def generar_pdf(informe):
     """Devuelve el informe PDF como bytes."""
