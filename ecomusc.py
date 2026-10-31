@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Sat Oct 31 17:38:17 2026
 
@@ -138,6 +136,194 @@ def crear_filas_mediciones(informe):
 
     return filas
 
+# ------------------------------
+# Referencias aportadas para la interpretación
+# ------------------------------
+PUNTOS_CORTE = {
+    "Hombre": [
+        ("Desnutrición severa", 3.32),
+        ("Riesgo de sarcopenia", 3.48),
+        ("Sarcopenia grave confirmada", 3.41),
+    ],
+    "Mujer": [
+        ("Desnutrición severa", 3.05),
+        ("Riesgo de sarcopenia", 2.97),
+        ("Sarcopenia grave confirmada", 2.40),
+    ],
+}
+
+NOTA_INTERPRETACION = (
+    "Interpretación orientativa basada en los puntos de corte establecidos por Almeida et al. "
+    "No constituyen diagnósticos automáticos. "
+    "Los resultados requieren integración clínica."
+)
+
+
+def interpretar_informe(informe):
+    """
+    Devuelve bloques de interpretación comunes a pantalla y PDF.
+    Cada bloque es una pareja: título y lista de textos.
+    """
+    resultados = informe["resultados"]
+
+    media_y = resultados["media_y"]
+    area_actual = resultados["media_relajacion"]
+    cociente = resultados["cociente"]
+    delta = resultados["delta"]
+
+    sexo = informe.get("sexo")
+    bloques = []
+
+    # 1. Comparación con los puntos de corte basales.
+    textos_basales = []
+
+    if sexo not in PUNTOS_CORTE:
+        textos_basales.append(
+            "No se pueden aplicar los puntos de corte "
+            "sin seleccionar el sexo. Genera de nuevo el informe."
+        )
+
+    else:
+        textos_basales.append(
+            f"Referencias aplicadas: {sexo.lower()}. "
+            "Se comparan con la media del área en relajación."
+        )
+
+        for etiqueta, corte_area in PUNTOS_CORTE[sexo]:
+            
+            estado_area = (
+                "por debajo del punto de corte"
+                if area_actual < corte_area
+                else "no está por debajo del punto de corte"
+            )
+
+            textos_basales.append(
+                f"Referencia «{etiqueta}»: "
+                f"área en relajación {formato_numero(area_actual)} cm², "
+                f"{estado_area} (< {formato_numero(corte_area)} cm²)."
+            )
+
+
+    bloques.append((
+        "Comparación con referencias basales",
+        textos_basales,
+    ))
+
+    # 2. Evolución respecto al área previa.
+    textos_evolucion = []
+    area_previa = informe["area_previa"]
+
+    if delta is None:
+        textos_evolucion.append(
+            "Evolución del área no evaluable: "
+            "no se dispone de un área previa mayor que cero."
+        )
+
+    else:
+        diferencia_area = area_actual - area_previa
+        cambio_porcentual = delta * 100
+
+        textos_evolucion.append(
+            f"Cambio absoluto del área: "
+            f"{formato_numero(diferencia_area)} cm². "
+            f"Cambio relativo: "
+            f"{formato_numero(cambio_porcentual)} %."
+        )
+
+        if diferencia_area >= 0.5:
+            textos_evolucion.append(
+                "Se cumple el criterio de aumento del área "
+                "de al menos 0,5 cm², considerado como favorable. "
+            )
+        else:
+            textos_evolucion.append(
+                "No se alcanza el criterio de aumento del área "
+                "de al menos 0,5 cm². Esto, por sí solo, "
+                "no permite clasificar la evolución como desfavorable."
+            )
+
+        if delta <= -0.07:
+            reduccion = -cambio_porcentual
+
+            if delta >= -0.12:
+                textos_evolucion.append(
+                    f"Reducción relativa del área del "
+                    f"{formato_numero(reduccion)} %: "
+                    "dentro del intervalo de alerta del 7–12 % "
+                    "para diagnóstico de miopatía adquirida."
+                )
+            else:
+                textos_evolucion.append(
+                    f"Reducción relativa del área del "
+                    f"{formato_numero(reduccion)} %: "
+                    "supera el 12 %, extremo superior del intervalo "
+                    "de alerta para el diagnóstico de miopatía adquirida."
+                )
+
+            textos_evolucion.append(
+                "Hallazgo que requiere valoración clínica. "
+            )
+
+    bloques.append((
+        "Evolución de las medidas",
+        textos_evolucion,
+    ))
+
+    # 3. Grosor del tendón.
+    grosor = informe["grosor_tendon"]
+
+    if grosor > 1.8:
+        texto_tendon = (
+            f"Grosor del tendón central: "
+            f"{formato_numero(grosor)} mm, superior a 1,8 mm. "
+            "Supera el umbral asociado a la presencia"
+            "de miopatía y atrofia severa en pacientes críticos; "
+        )
+    else:
+        texto_tendon = (
+            f"Grosor del tendón central: "
+            f"{formato_numero(grosor)} mm. "
+            "No supera el umbral de 1,8 mm, por lo que sugiere presencia "
+            "de miopatía y atrofia severa en pacientes críticos "
+            "Este resultado no excluye patología muscular."
+        )
+
+    bloques.append((
+        "Grosor del tendón central",
+        [texto_tendon],
+    ))
+
+    # 4. Cociente de áreas: opcional.
+    if cociente is None:
+        texto_cociente = (
+            "Cociente de áreas no evaluable: faltan mediciones "
+            "en contracción o la media del área en relajación es cero. "
+            "Este cálculo es opcional."
+        )
+
+    elif cociente >= 0.5:
+        texto_cociente = (
+            f"Cociente contracción/relajación: "
+            f"{formato_numero(cociente, 4)}, igual o superior a 0,5. "
+            "Indicativo de contractilidad conservada. "
+            "Debe interpretarse junto con la técnica de adquisición "
+            "y la valoración funcional."
+        )
+
+    else:
+        texto_cociente = (
+            f"Cociente contracción/relajación: "
+            f"{formato_numero(cociente, 4)}, inferior a 0,5. "
+            "Indicativo de disfunción muscular según criterios GLIM. "
+            "No permite diferenciar por sí solo sarcopenia, "
+            "infiltración grasa, fibrosis u otras causas de disfunción."
+        )
+
+    bloques.append((
+        "Cociente de áreas",
+        [texto_cociente],
+    ))
+
 
 def generar_pdf(informe):
     """Devuelve el informe PDF como bytes."""
@@ -272,10 +458,15 @@ def generar_pdf(informe):
 
     elementos.append(Spacer(1, 0.4 * cm))
 
-    texto(
-        "Informe descriptivo de los datos introducidos. "
-        "No incorpora interpretación clínica automática."
-    )
+    texto("Interpretación orientativa", "Heading2")
+    texto(NOTA_INTERPRETACION)
+
+    for titulo, textos in interpretar_informe(informe):
+        texto(titulo, "Heading3")
+
+        for texto_interpretacion in textos:
+            texto(texto_interpretacion)
+
     texto(f"Generado el {informe['generado_el']}.")
 
     documento.build(elementos)
@@ -391,9 +582,16 @@ def mostrar_informe(informe):
         "Delta = (media del área en relajación − área previa) / área previa."
     )
 
-    st.caption(
-        "Informe descriptivo, sin interpretación clínica automática."
-    )
+    st.markdown("---")
+    st.subheader("Interpretación orientativa")
+
+    st.caption(NOTA_INTERPRETACION)
+
+    for titulo, textos in interpretar_informe(informe):
+        st.markdown(f"#### {titulo}")
+
+        for texto_interpretacion in textos:
+            st.write(texto_interpretacion)
 
 
 # ------------------------------
@@ -427,6 +625,13 @@ with st.sidebar:
         identificador = st.text_input(
             "ID",
             help="Utiliza preferiblemente un identificador seudonimizado.",
+        )
+
+        sexo = st.selectbox(
+            "Sexo",
+            ["Hombre", "Mujer"],
+            index=None,
+            placeholder="Selecciona una opción",
         )
 
         fecha = st.date_input(
@@ -557,6 +762,9 @@ if generar:
 
     if not identificador.strip():
         errores.append("Introduce el ID.")
+        
+    if sexo is None:
+        errores.append("Selecciona el sexo para aplicar los puntos de corte.")
 
     if localizacion is None:
         errores.append("Introduce la localización.")
@@ -619,6 +827,7 @@ if generar:
 
         informe = {
             "id": identificador.strip(),
+            "sexo": sexo,
             "fecha": fecha,
             "localizacion": localizacion,
             "lado": lado,
