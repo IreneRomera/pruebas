@@ -198,10 +198,11 @@ def interpretar_informe(informe):
             )
 
             textos_basales.append(
-                f"Referencia «{etiqueta}»: "
-                f"área en relajación {formato_numero(area_actual)} cm², "
-                f"{estado_area} (< {formato_numero(corte_area)} cm²)."
+                f"Referencia «{etiqueta}»:    "
+                f"Área en relajación {formato_numero(area_actual)} cm², "
+                f"{estado_area}."
             )
+
 
 
     bloques.append((
