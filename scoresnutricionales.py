@@ -13,6 +13,21 @@ import re
 from streamlit_extras.buy_me_a_coffee import button
 import streamlit as st
 
+from io import BytesIO
+from xml.sax.saxutils import escape
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+)
+
 
 # ============================================================
 # CONFIGURACIÓN
@@ -97,6 +112,206 @@ def informe_a_texto(informe):
 
     return "\n".join(lineas)
 
+def informe_a_pdf(informe):
+    """Genera el informe nutricional en PDF y devuelve sus bytes."""
+    buffer = BytesIO()
+
+    documento = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=1.5 * cm,
+        leftMargin=1.5 * cm,
+        topMargin=1.5 * cm,
+        bottomMargin=1.8 * cm,
+        title=f"Informe nutricional - {informe['score']}",
+        author="Irene Romera",
+    )
+
+    estilos = getSampleStyleSheet()
+
+    estilos["BodyText"].fontSize = 9
+    estilos["BodyText"].leading = 13
+    estilos["BodyText"].spaceAfter = 6
+
+    elementos = []
+
+    def parrafo(contenido, estilo="BodyText"):
+        # Escapa símbolos como < y > para que no se interpreten
+        # como etiquetas de formato de ReportLab.
+        contenido_seguro = escape(str(contenido))
+        contenido_seguro = contenido_seguro.replace("\n", "<br/>")
+
+        return Paragraph(
+            contenido_seguro,
+            estilos[estilo],
+        )
+
+    def pie_pagina(canvas, doc):
+        canvas.saveState()
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.grey)
+
+        canvas.drawString(
+            doc.leftMargin,
+            1.0 * cm,
+            "Informe de valoración nutricional",
+        )
+
+        canvas.drawRightString(
+            A4[0] - doc.rightMargin,
+            1.0 * cm,
+            f"Página {doc.page}",
+        )
+
+        canvas.restoreState()
+
+    # ------------------------------
+    # Cabecera
+    # ------------------------------
+    elementos.append(
+        parrafo("Informe de valoración nutricional", "Title")
+    )
+
+    elementos.append(
+        parrafo(f"Instrumento: {informe['score']}", "Heading2")
+    )
+
+    elementos.append(parrafo(f"ID: {informe['id']}"))
+    elementos.append(parrafo(f"Fecha: {informe['fecha']}"))
+
+    elementos.append(Spacer(1, 0.3 * cm))
+
+    # ------------------------------
+    # Resultado
+    # ------------------------------
+    elementos.append(parrafo("Resultado", "Heading2"))
+    elementos.append(parrafo(informe["resultado"]))
+
+    elementos.append(Spacer(1, 0.3 * cm))
+
+    # ------------------------------
+    # Tabla de desglose
+    # ------------------------------
+    elementos.append(parrafo("Desglose", "Heading2"))
+
+    filas = informe.get("filas", [])
+
+    if filas:
+        columnas = list(filas[0].keys())
+
+        datos_tabla = [
+            [
+                parrafo(columna)
+                for columna in columnas
+            ]
+        ]
+
+        for fila in filas:
+            datos_tabla.append([
+                parrafo(fila.get(columna, ""))
+                for columna in columnas
+            ])
+
+        # Distribución adaptada a las tablas de cada instrumento.
+        if len(columnas) == 3:
+            proporciones = [0.24, 0.62, 0.14]
+        elif len(columnas) == 4:
+            proporciones = [0.18, 0.36, 0.28, 0.18]
+        else:
+            proporciones = [
+                1 / len(columnas)
+                for _ in columnas
+            ]
+
+        anchos = [
+            documento.width * proporcion
+            for proporcion in proporciones
+        ]
+
+        tabla = Table(
+            datos_tabla,
+            colWidths=anchos,
+            repeatRows=1,
+            hAlign="LEFT",
+        )
+
+        tabla.setStyle(
+            TableStyle([
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    colors.HexColor("#EDE0F5"),
+                ),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [colors.white, colors.HexColor("#F7F7F7")],
+                ),
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.4,
+                    colors.HexColor("#CCCCCC"),
+                ),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 7),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+                ("TOPPADDING", (0, 0), (-1, -1), 7),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+            ])
+        )
+
+        elementos.append(tabla)
+
+    else:
+        elementos.append(
+            parrafo("No hay datos de desglose disponibles.")
+        )
+
+    elementos.append(Spacer(1, 0.4 * cm))
+
+    # ------------------------------
+    # Observaciones
+    # ------------------------------
+    if informe.get("notas"):
+        elementos.append(parrafo("Observaciones", "Heading2"))
+
+        for nota in informe["notas"]:
+            elementos.append(parrafo(f"• {nota}"))
+
+    elementos.append(Spacer(1, 0.3 * cm))
+
+    # ------------------------------
+    # Referencia y pie
+    # ------------------------------
+    elementos.append(
+        parrafo(
+            "Resultado de apoyo a la valoración clínica. "
+            "No sustituye el juicio clínico."
+        )
+    )
+
+    elementos.append(
+        parrafo(
+            "App desarrollada por Irene Romera / "
+            "irene.r.s@outlook.com"
+        )
+    )
+
+    documento.build(
+        elementos,
+        onFirstPage=pie_pagina,
+        onLaterPages=pie_pagina,
+    )
+
+    pdf_bytes = buffer.getvalue()
+    buffer.close()
+
+    return pdf_bytes
+
 
 def mostrar_informe(informe):
     st.header(f"Informe: {informe['score']}")
@@ -126,23 +341,59 @@ def mostrar_informe(informe):
         "No sustituye el juicio clínico."
     )
 
+    # ------------------------------
+    # Descarga del informe
+    # ------------------------------
     id_archivo = re.sub(
         r"[^A-Za-z0-9_-]+",
         "_",
         informe["id"],
-    )[:60]
+    )[:60] or "sin_id"
 
+    nombre_base = (
+        f"{informe['score']}_{id_archivo}_"
+        f"{informe['fecha']}"
+    )
+
+    st.subheader("Descargar informe")
+
+    # Se conserva la descarga de texto.
     st.download_button(
-        "Descargar informe en texto",
+        label="Descargar informe en TXT",
         data=informe_a_texto(informe).encode("utf-8"),
-        file_name=(
-            f"{informe['score']}_{id_archivo}_"
-            f"{informe['fecha']}.txt"
-        ),
+        file_name=f"{nombre_base}.txt",
         mime="text/plain",
-        key="descarga_informe_nutricional",
+        key="descarga_informe_nutricional_txt",
         use_container_width=True,
     )
+
+    # Se añade la descarga en PDF.
+    try:
+        pdf_bytes = informe_a_pdf(informe)
+
+    except Exception:
+        st.error(
+            "No se ha podido generar el PDF. "
+            "La descarga en TXT sigue disponible. "
+            "Revisa los registros de la aplicación."
+        )
+
+        # Registra el detalle técnico sin mostrar datos
+        # del informe en la interfaz.
+        import logging
+        logging.getLogger(__name__).exception(
+            "Error al generar el informe nutricional en PDF"
+        )
+
+    else:
+        st.download_button(
+            label="Descargar informe en PDF",
+            data=pdf_bytes,
+            file_name=f"{nombre_base}.pdf",
+            mime="application/pdf",
+            key="descarga_informe_nutricional_pdf",
+            use_container_width=True,
+        )
 
 
 # ============================================================
