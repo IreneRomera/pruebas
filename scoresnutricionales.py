@@ -583,11 +583,6 @@ def calcular_filnut(albumina, prealbumina, proteinas, linfocitos, colesterol):
 
             "La albúmina y la prealbúmina no se suman entre sí: "
             "se utiliza la de mayor puntuación.",
-
-            "Antes de utilizar clínicamente la calculadora, confirma "
-            "esa unidad con el documento original y el laboratorio. "
-            "El código aplica directamente los umbrales numéricos "
-            "800, 1200 y 1600, sin convertir unidades.",
         ],
     }
 
