@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 st.title("Calculadora de scores nutricionales")
-st.subheader("⬅ Selecciona el instrumento e introduce los datos")
+st.subheader("⬅ Selecciona la escala e introduce los datos")
 
 SCORES = ["NRS-2002", "NUTRIC-PCR", "FILNUT", "GLIM"]
 
