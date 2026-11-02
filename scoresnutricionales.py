@@ -28,12 +28,7 @@ st.subheader("⬅ Selecciona el instrumento e introduce los datos")
 
 SCORES = ["NRS-2002", "NUTRIC-PCR", "FILNUT", "GLIM"]
 
-FUENTES = {
-    "NRS-2002": "Chuleta NRS-2002 y NUTRIC-PCR v2.0 aportada.",
-    "NUTRIC-PCR": "Chuleta NRS-2002 y NUTRIC-PCR v2.0 aportada.",
-    "FILNUT": "Documento de valoración de malnutrición FILNUT aportado.",
-    "GLIM": "Documento de valoración de malnutrición GLIM aportado.",
-}
+
 
 
 # ============================================================
@@ -97,8 +92,6 @@ def informe_a_texto(informe):
 
     lineas.extend([
         "",
-        f"Referencia: {FUENTES[informe['score']]}",
-        "",
         "Resultado de apoyo a la valoración clínica. "
         "No sustituye el juicio clínico.",
     ])
@@ -129,7 +122,6 @@ def mostrar_informe(informe):
         for nota in informe["notas"]:
             st.write(f"• {nota}")
 
-    st.caption(f"Referencia: {FUENTES[informe['score']]}")
     st.caption(
         "Resultado de apoyo a la valoración clínica. "
         "No sustituye el juicio clínico."
