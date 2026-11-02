@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
 Calculadora de instrumentos nutricionales:
 NRS-2002, NUTRIC-PCR, FILNUT y GLIM.
@@ -11,7 +10,7 @@ Reglas basadas en los documentos aportados.
 from datetime import date
 import math
 import re
-
+from streamlit_extras.buy_me_a_coffee import button
 import streamlit as st
 
 
@@ -1115,3 +1114,12 @@ else:
 # ============================================================
 st.markdown("---")
 st.caption("App desarrollada por Irene Romera / irene.r.s@outlook.com")
+
+button(
+    username="ireneromera",
+    floating=False,
+    text="Invítame a un té",
+    emoji="🫖",
+    bg_color="#C084FC",
+    font_color="#FFFFFF",
+)
